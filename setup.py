@@ -7,7 +7,7 @@ except ImportError:
 
 
 config = {
-    'description': 'Experiments with intrinsically motivated reinforcement learners.',
+    'description': 'Intrinsically motivated, model-based hierarchical reinforcement learning agents.',
     'author': 'Chris Vigorito and Xander Dunn',
     'url': 'https://bitbucket.org/ChrisVigorito/imrl',
     'download_url': 'https://bitbucket.org/ChrisVigorito/imrl',
@@ -16,7 +16,7 @@ config = {
     'install_requires': ['pytest', 'numpy', 'scipy', 'scikit-learn'],
     'packages': ['imrl'],
     'scripts': [],
-    'name': 'Intrinsicly Motivated Reinforcement Learning'
+    'name': 'Intrinsically Motivated Reinforcement Learning'
 }
 
 setup(**config)
