@@ -1,6 +1,6 @@
 """Test the combination lock."""
 
-from imrl.combination_lock import hello
+from imrl.environment.combination_lock import hello
 
 
 def test_hello():
