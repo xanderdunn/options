@@ -6,7 +6,6 @@ import sys
 import argparse
 import logging
 
-
 def parse_args(argv):
     """Create command line arguments parser."""
     parser = argparse.ArgumentParser()
@@ -24,8 +23,6 @@ def log_level(level_string):
         return logging.INFO
     elif level_string == "WARNING":
         return logging.WARNING
-    elif level_string == "DEBUG":
-        return logging.DEBUG
 
 
 def main(argv):

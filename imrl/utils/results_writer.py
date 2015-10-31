@@ -1,3 +1,3 @@
-__author__ = 'Chris'
+"""Writes experiment results data to output files."""
 
-'''Generic class for writing results data to CSV files.'''
+

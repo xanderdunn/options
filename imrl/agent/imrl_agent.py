@@ -1,3 +1,2 @@
-__author__ = 'Chris'
+"""Agent class for managing all algorithms and data structures required by an imrl agent."""
 
-'''Agent class for managing all algorithms and data structures required by an imrl agent.'''

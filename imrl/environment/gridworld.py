@@ -1,3 +1,2 @@
-__author__ = 'Chris'
+"""Discrete gridworld implementation"""
 
-'''Discrete gridworld implementation'''
