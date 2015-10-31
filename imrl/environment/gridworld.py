@@ -1,2 +1,2 @@
-"""Discrete gridworld implementation"""
+"""Discrete gridworld environment."""
 

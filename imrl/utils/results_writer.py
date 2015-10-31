@@ -1,3 +1,3 @@
-"""Writes experiment results data to output files."""
+"""Write experimental results data to output files."""
 
 

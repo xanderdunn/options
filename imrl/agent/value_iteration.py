@@ -1,4 +1,4 @@
-"""Value iteration algorithm implementation."""
+"""Value iteration algorithm."""
 
 
 

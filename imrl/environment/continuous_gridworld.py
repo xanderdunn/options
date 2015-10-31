@@ -1,2 +1,2 @@
-"""Continuous gridworld implementation"""
+"""Continuous gridworld environment."""
 
