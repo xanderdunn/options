@@ -60,5 +60,3 @@ target/
 
 #Project Specific
 .idea/
-.cache/
-*.pyc
