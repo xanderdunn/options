@@ -11,7 +11,7 @@ def parse_args(argv):
     """Create command line arguments parser."""
     parser = argparse.ArgumentParser()
     parser.add_argument('--seed', help='Seed with which to initialize random number generator.', type=float, nargs='+')
-    parser.add_argument('--episodes', help="Number of episodes to run the experiment.", type=int, nargs="+")
+    parser.add_argument('--episodes', help='Number of episodes to run the experiment.', type=int, nargs='+')
     parser.add_argument('--log', help='Set log level.', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default='INFO')
     return parser.parse_args(argv)
 

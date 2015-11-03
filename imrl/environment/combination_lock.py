@@ -3,4 +3,4 @@
 
 def hello():
     """Test function."""
-    return "Hello"
+    return 'Hello'
