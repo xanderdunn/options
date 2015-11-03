@@ -8,12 +8,6 @@ from imrl.agent import agent_gridworld
 from imrl.environment import gridworld
 
 
-def generate_episode_id(num_episodes):
-    """Episode ID"""
-    for i in range(num_episodes):
-        yield i
-
-
 def generate_step_id(step):
     '''Step ID'''
     yield step + 1
@@ -35,7 +29,7 @@ def generate_states(state, environment):
 
 def start(num_episodes, environment):
     '''Kick off the execution of an experiment.'''
-    for episode_id in generate_episode_id(num_episodes):
+    for episode_id in (i for i in range(num_episodes)):
         logging.info('Starting episode {}'.format(episode_id))
         for _ in generate_states(gridworld.State(gridworld.Position(0, 0), False, None), environment):
             logging.info('Terminated')
