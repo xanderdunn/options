@@ -1,4 +1,4 @@
-"""Test the combination lock."""
+"""Test the gridworld environment."""
 
 # System
 import random
