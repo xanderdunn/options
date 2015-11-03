@@ -5,13 +5,18 @@
 import sys
 import argparse
 import logging
+import random
+
+# IMRL
+from imrl.interface import experiment
+from imrl.environment.gridworld import Gridworld
 
 
 def parse_args(argv):
     """Create command line arguments parser."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('--seed', help='Seed with which to initialize random number generator.', type=float, nargs='+')
-    parser.add_argument('--episodes', help='Number of episodes to run the experiment.', type=int, nargs='+')
+    parser.add_argument('--seed', help='Seed with which to initialize random number generator.', type=float)
+    parser.add_argument('--episodes', help='Number of episodes to run the experiment.', type=int)
     parser.add_argument('--log', help='Set log level.', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default='INFO')
     return parser.parse_args(argv)
 
@@ -28,9 +33,12 @@ def log_level(level_string):
 
 def main(argv):
     """Execute experiment."""
+    sys.setrecursionlimit(10000)
     args = parse_args(argv)
+    random.seed(args.seed)
     logging.basicConfig(level=log_level(args.log))
-    logging.info('Started execution.')
+    logging.info('Starting execution.')
+    experiment.start(args.episodes, Gridworld(10, 0.1))
 
 
 if __name__ == '__main__':
