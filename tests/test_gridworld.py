@@ -27,7 +27,5 @@ def test_taking_actions():
 def test_termination():
     '''Does the environment terminate in the correct state?'''
     environment = Gridworld(4, 0.1)
-    if is_terminal(Position(0, 0), environment):
-        assert False
-    if not is_terminal(Position(3, 3), environment):
-        assert False
+    assert not is_terminal(Position(0, 0), environment)
+    assert is_terminal(Position(3, 3), environment)
