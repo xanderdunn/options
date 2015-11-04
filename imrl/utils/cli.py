@@ -9,7 +9,8 @@ import random
 
 # IMRL
 from imrl.interface import experiment
-from imrl.environment.gridworld import Gridworld
+import imrl.environment.gridworld as gw
+from imrl.agent.agent import RandomAgent, policy_random, decide_action
 
 
 def parse_args(argv):
@@ -18,6 +19,8 @@ def parse_args(argv):
     parser.add_argument('--seed', help='Seed with which to initialize random number generator.', type=float)
     parser.add_argument('--episodes', help="Number of episodes to run the experiment.", type=int, default=6)
     parser.add_argument('--log', help='Set log level.', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default='INFO')
+    parser.add_argument('--environment', help='Choose the environment.', choices=['gridworld'], default='gridworld')
+    parser.add_argument('--agent_policy', help='Choose the agent\'s policy.', choices=['random'], default='random')
     return parser.parse_args(argv)
 
 
@@ -38,7 +41,9 @@ def main(argv):
     random.seed(args.seed)
     logging.basicConfig(level=log_level(args.log))
     logging.info('Starting execution.')
-    experiment.start(args.episodes, Gridworld(10, 0.1))
+    agent = (args.agent_policy == 'random' and RandomAgent(policy_random, decide_action))
+    environment = (args.environment == 'gridworld' and gw.Gridworld(10, 0.1, gw.take_action, 4, gw.initial_state))
+    experiment.start(args.episodes, agent, environment)
 
 
 if __name__ == '__main__':
