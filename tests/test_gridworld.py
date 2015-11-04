@@ -21,8 +21,7 @@ def test_taking_actions():
     stochastic_environment = Gridworld(4, 0.1)
     assert ratio_test(lambda state: state == State(Position(0, 0), False, 0), partial(take_action, initial_state, Action.right, stochastic_environment), 10000) == 1.0
     ratio = ratio_test(lambda state: state == State(Position(0, 0), False, 0), partial(take_action, initial_state, Action.up, stochastic_environment), 10000)
-    assert ratio > 0.092
-    assert ratio < 0.108
+    assert ratio > 0.09 and ratio < 0.11
 
 
 def test_termination():
