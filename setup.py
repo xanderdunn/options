@@ -13,7 +13,7 @@ config = {
     'download_url': 'https://bitbucket.org/ChrisVigorito/imrl',
     'author_email': 'cmvigorito@gmail.com',
     'version': '0',
-    'install_requires': ['pytest', 'numpy', 'scipy', 'scikit-learn'],
+    'install_requires': ['pytest', 'numpy', 'scipy', 'scikit-learn', 'pyrsistent', 'cytoolz', 'more_itertools'],
     'packages': ['imrl'],
     'scripts': [],
     'name': 'Intrinsically Motivated Reinforcement Learning'
