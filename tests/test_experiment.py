@@ -1,10 +1,10 @@
-"""Test the combination lock."""
+"""Test the agent-environment interface."""
 
-from imrl.interface.experiment import generate_episode_id
+from imrl.interface.experiment import episode_id_generator
 
 
 def test_episode_generation():
-    """Are episodes generated correctly?"""
-    assert list(generate_episode_id(0)) == []
-    assert list(generate_episode_id(1)) == [0]
-    assert list(generate_episode_id(4)) == [0, 1, 2, 3]
+    '''Are episodes generated correctly?'''
+    assert list(episode_id_generator(0)) == []
+    assert list(episode_id_generator(1)) == [0]
+    assert list(episode_id_generator(4)) == [0, 1, 2, 3]

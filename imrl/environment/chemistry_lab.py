@@ -1,2 +1,1 @@
-"""Chemistry Lab environment."""
-
+"""Chemistry lab environment."""
