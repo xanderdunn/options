@@ -5,7 +5,11 @@ import logging
 from collections import namedtuple
 
 # Third party
-from more_itertools import iterate
+from more_itertools import iterate, chunked
+from pyrsistent import m
+
+# IMRL
+from imrl.utils.results_writer import write_results, merge_results, initialize_results
 
 
 StepData = namedtuple('StepData', ('state', 'step_id'))
@@ -21,6 +25,7 @@ def run_step(step_data, agent, environment):
     state = step_data.state
     if state.is_terminal:
         logging.info('Terminated')
+    # TODO: Separate this into sending state and getting an action
     action = agent.decide_action(agent.policy, state, environment.num_actions)
     state = environment.take_action(state, action, environment)
     return StepData(state, step_data.step_id + 1)
@@ -32,19 +37,23 @@ def generate_state(agent, environment):
     return iterate(lambda state: run_step(state, agent, environment), initial_step_data)
 
 
-def run_episode(agent, environment):
-    '''Run through a single episode to termination.'''
+def run_episode(episode_id, agent, environment):
+    '''Run through a single episode to termination.  Returns '''
+    logging.info('Starting episode {}'.format(episode_id))
     for step_data in generate_state(agent, environment):
         if step_data.state.is_terminal:
-            logging.info('Terminated in state {}'.format(step_data))
-            break
-        else:
-            logging.debug('Visited state {}'.format(step_data))
+            return m(episode_id=episode_id, steps=step_data.step_id)
+
+
+def episode_results_generator(num_episodes, agent, environment):
+    '''Execute episodes and yield the results for each episode.'''
+    return (run_episode(episode_id, agent, environment) for episode_id in episode_id_generator(num_episodes))
 
 
 # Think about using tee and chain, or izip to generate the step_id along with the episode_id
-def start(num_episodes, agent, environment, logging_interval):
+def start(num_episodes, agent, environment, results_descriptor):
     '''Kick off the execution of an experiment.'''
-    for episode_id in episode_id_generator(num_episodes):
-        logging.info('Starting episode {}'.format(episode_id))
-        run_episode(agent, environment)
+    initialize_results(results_descriptor)
+    results_episode_chunks = chunked(episode_results_generator(num_episodes, agent, environment), results_descriptor.interval)
+    for chunk in results_episode_chunks:
+        write_results(merge_results(chunk), results_descriptor)
