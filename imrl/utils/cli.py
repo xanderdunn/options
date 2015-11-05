@@ -11,7 +11,8 @@ import os
 # IMRL
 from imrl.interface import experiment
 import imrl.environment.gridworld as gw
-from imrl.agent.agent import RandomAgent, policy_random, decide_action
+from imrl.agent.agent import Agent, decide_action
+from imrl.agent.policy import policy_random
 from imrl.utils.results_writer import ResultsDescriptor
 
 
@@ -43,7 +44,7 @@ def main(argv):
     args = parse_args(argv)
     random.seed(args.seed)
     logging.basicConfig(level=log_level(args.log_level))
-    agent = (args.agent_policy == 'random' and RandomAgent(policy_random, decide_action))
+    agent = (args.agent_policy == 'random' and Agent(policy_random, decide_action))
     environment = (args.environment == 'gridworld' and gw.Gridworld(10, 0.1, gw.take_action, 4, gw.initial_state))
     results_descriptor = ResultsDescriptor(args.results_interval, args.results_path, ['episode_id', 'steps'])
     experiment.start(args.episodes, agent, environment, results_descriptor)
