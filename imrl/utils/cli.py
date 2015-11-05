@@ -21,7 +21,7 @@ def parse_args(argv):
     parser.add_argument('--seed', help='Seed with which to initialize random number generator.', type=int)
     parser.add_argument('--results_interval', help='Log results out to terminal and file every n episodes.', type=int, default=100)
     parser.add_argument('--results_path', help='File path to save the results to.  Default is results.txt in the current working directory.', default=os.path.join(os.getcwd(), 'results.txt'))
-    parser.add_argument('--episodes', help="Number of episodes to run the experiment.", type=int, default=10000)
+    parser.add_argument('--episodes', help='Number of episodes to run the experiment.', type=int, default=10000)
     parser.add_argument('--log_level', help='Set log level.', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default='INFO')
     parser.add_argument('--environment', help='Choose the environment.', choices=['gridworld'], default='gridworld')
     parser.add_argument('--agent_policy', help='Choose the agent\'s policy.', choices=['random'], default='random')
