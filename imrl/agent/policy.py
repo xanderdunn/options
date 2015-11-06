@@ -4,7 +4,7 @@ import random
 
 
 def policy_random(state, num_actions):
-    '''A policy where the an action is randmoly chosen.'''
+    """A policy where the an action is randmoly chosen."""
     return random.randint(0, num_actions - 1)
 
 

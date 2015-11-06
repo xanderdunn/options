@@ -12,7 +12,7 @@ from imrl.utils.results_writer import write_results, read_results, ResultsDescri
 
 
 def test_results_writer():
-    '''Does the results writer output what it should?'''
+    """Does the results writer output what it should?"""
     results = m(episode=v(0, 1, 2), step_count=v(12, 22, 11))
     output_path = os.path.join(os.getcwd(), 'results.txt')
     results_descriptor = ResultsDescriptor(2, output_path, ['episode', 'step_count'])

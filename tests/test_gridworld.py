@@ -10,7 +10,7 @@ from tests.tools import ratio_test
 
 
 def test_taking_actions():
-    '''Does the environment correctly change the state when told to take an action with and without stochasticity?'''
+    """Does the environment correctly change the state when told to take an action with and without stochasticity?"""
     random.seed()
     deterministic_environment = Gridworld(4, 0.0, take_action, 4, initial_state)
     assert take_action(initial_state(), Action.up, deterministic_environment) == State(Position(0, 1), False, 0)
@@ -24,7 +24,7 @@ def test_taking_actions():
 
 
 def test_termination():
-    '''Does the environment terminate in the correct state?'''
+    """Does the environment terminate in the correct state?"""
     environment = Gridworld(4, 0.1, take_action, 4, initial_state)
     assert not is_terminal(Position(0, 0), environment)
     assert is_terminal(Position(3, 3), environment)

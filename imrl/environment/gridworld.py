@@ -1,14 +1,13 @@
 """Discrete gridworld environment."""
 
 # System
-import logging
 from collections import namedtuple
 from enum import Enum
 import random
 
 
 class Action(Enum):
-    '''Possible actions that can be taken in the gridworld.'''
+    """Possible actions that can be taken in the gridworld."""
     up = 0
     down = 1
     left = 2
@@ -25,23 +24,23 @@ State = namedtuple("State", ('position', 'is_terminal', 'reward'))
 
 
 def initial_state():
-    '''The state the agent starts in at the beginning of each episode.'''
+    """The state in which the agent starts at the beginning of each episode."""
     return State(Position(0, 0), False, None)
 
 
 def reward(position, environment):
-    '''Calculate the reward based on the previous and new positions.'''
+    """Calculate the reward based on the previous and new positions."""
     return (is_terminal(position, environment) and 1) or \
            (0)
 
 
 def is_terminal(position, environment):
-    '''Is this position terminal?  That is, is it in the upper left corner?'''
+    """Is this position terminal?  That is, is it in the upper left corner?"""
     return position == Position(environment.size - 1, environment.size - 1)
 
 
 def take_action(current_state, action, environment):
-    '''Apply the given action and return the new state.'''
+    """Apply the given action and return the new state."""
     posx = current_state.position.x
     posy = current_state.position.y
     if random.random() > environment.failure_rate:

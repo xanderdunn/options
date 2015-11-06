@@ -9,10 +9,10 @@ Agent = namedtuple('Agent', ('policy', 'decide_action'))
 
 
 def agent_random():
-    '''An agent with a random policy.'''
+    """An agent with a random policy."""
     return Agent(policy_random, decide_action)
 
 
 def decide_action(policy, state, num_actions):
-    '''Receive the environment's latest state and return an action to take.'''
+    """Receive the environment's latest state and return an action to take."""
     return policy(state, num_actions)
