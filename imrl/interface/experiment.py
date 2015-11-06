@@ -38,7 +38,7 @@ def generate_state(agent, environment):
 
 
 def run_episode(episode_id, agent, environment):
-    '''Run through a single episode to termination.  Returns '''
+    '''Run through a single episode to termination.  Returns the results for that episode.'''
     logging.info('Starting episode {}'.format(episode_id))
     for step_data in generate_state(agent, environment):
         if step_data.state.is_terminal:
