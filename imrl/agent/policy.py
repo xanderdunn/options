@@ -8,6 +8,11 @@ def policy_random(state, num_actions):
     return random.randint(0, num_actions - 1)
 
 
+def policy_primitive(fv, num_actions):
+    """The option policy for the primitive action situation is to simply execute that action."""
+    return fv
+
+
 class Policy:
 
     def __init__(self, id):
