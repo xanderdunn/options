@@ -13,13 +13,13 @@ def test_taking_actions():
     """Does the environment correctly change the state when told to take an action with and without stochasticity?"""
     random.seed()
     deterministic_environment = Gridworld(4, 0.0, take_action, 4, initial_state)
-    assert take_action(initial_state(), Action.up, deterministic_environment) == State(Position(0, 1), False, 0)
-    assert take_action(initial_state(), Action.down, deterministic_environment) == State(Position(0, 0), False, 0)
-    assert take_action(initial_state(), Action.left, deterministic_environment) == State(Position(1, 0), False, 0)
-    assert take_action(initial_state(), Action.right, deterministic_environment) == State(Position(0, 0), False, 0)
+    assert take_action(initial_state(), deterministic_environment.size, Action.up, deterministic_environment) == State(Position(0, 1), 4, False, 0)
+    assert take_action(initial_state(), deterministic_environment.size, Action.down, deterministic_environment) == State(Position(0, 0), 0, False, 0)
+    assert take_action(initial_state(), deterministic_environment.size, Action.left, deterministic_environment) == State(Position(1, 0), 1, False, 0)
+    assert take_action(initial_state(), deterministic_environment.size, Action.right, deterministic_environment) == State(Position(0, 0), 0, False, 0)
     stochastic_environment = Gridworld(4, 0.1, take_action, 4, initial_state)
-    assert ratio_test(lambda state: state == State(Position(0, 0), False, 0), partial(take_action, initial_state(), Action.right, stochastic_environment), 10000) == 1.0
-    ratio = ratio_test(lambda state: state == State(Position(0, 0), False, 0), partial(take_action, initial_state(), Action.up, stochastic_environment), 10000)
+    assert ratio_test(lambda state: state == State(Position(0, 0), 0, False, 0), partial(take_action, initial_state(), deterministic_environment.size, Action.right, stochastic_environment), 10000) == 1.0
+    ratio = ratio_test(lambda state: state == State(Position(0, 0), 0, False, 0), partial(take_action, initial_state(), deterministic_environment.size, Action.up, stochastic_environment), 10000)
     assert ratio > 0.09 and ratio < 0.11
 
 

@@ -20,12 +20,12 @@ Gridworld = namedtuple("Gridworld", ('size',            # The gridworld is size 
                                      'initial_state'))  # State where the agent begins each episode
 
 Position = namedtuple('Position', ('x', 'y'))
-State = namedtuple("State", ('position', 'is_terminal', 'reward'))
+State = namedtuple("State", ('position', 'value', 'is_terminal', 'reward'))
 
 
 def initial_state():
     """The state in which the agent starts at the beginning of each episode."""
-    return State(Position(0, 0), False, None)
+    return State(Position(0, 0), 0, False, None)
 
 
 def reward(position, environment):
@@ -39,7 +39,7 @@ def is_terminal(position, environment):
     return position == Position(environment.size - 1, environment.size - 1)
 
 
-def take_action(current_state, action, environment):
+def take_action(current_state, size, action, environment):
     """Apply the given action and return the new state."""
     posx = current_state.position.x
     posy = current_state.position.y
@@ -52,6 +52,6 @@ def take_action(current_state, action, environment):
         new_pos = ((tentative_pos.x >= 0 and tentative_pos.y >= 0 and
                     tentative_pos.y < environment.size and tentative_pos.x < environment.size) and tentative_pos) or \
                   (current_state.position)
-        return State(new_pos, is_terminal(new_pos, environment), 0)
+        return State(new_pos, new_pos.x + size * new_pos.y, is_terminal(new_pos, environment), 0)
     else:
-        return State(current_state.position, is_terminal(current_state.position, environment), 0)
+        return State(current_state.position, current_state.value, is_terminal(current_state.position, environment), 0)

@@ -8,17 +8,17 @@ from collections import namedtuple
 import numpy as np
 
 
-UOM = namedtuple('UOM', ['eta',      # learning rate
-                         'gamma',    # Discount factor
-                         'tau',      # time taken for the option to execute
-                         'initial_m',
-                         'initial_u',
-                         'converged', 
-                         'epsilon'])
+UOMDescriptor = namedtuple('UOMDescriptor', ('eta',      # learning rate
+                                             'gamma',    # Discount factor
+                                             'tau',      # time taken for the option to execute
+                                             'converged',
+                                             'epsilon'))
+UOM = namedtuple('UOM', ('descriptor', 'm', 'u'))
 
 
 def uom_primitive(fv_size):
-    return UOM(1.0, 0.999, 1.0, initial_m(fv_size), initial_u(fv_size), converged, 0.001)
+    descriptor = UOMDescriptor(1.0, 0.999, 1.0, converged, 0.001)
+    return UOM(descriptor, initial_m(fv_size), initial_u(fv_size))
 
 
 def initial_m(fv_size):
@@ -33,23 +33,25 @@ def initial_u(fv_size):
 
 def converged(m, m_prime, u, u_prime, epsilon):
     """Check if the model has converged sufficiently."""
-    return (m - m_prime < epsilon) or false
+    return (m - m_prime < epsilon) or False
 
 
-def update_m(uom, m, fv, fv_prime):
+def update_m(uom, fv, fv_prime):
     """Given the current matrix M, the previous feature vector fv, and the next feature vector fv_prime, return the updated matrix M."""
-    eta = uom.eta
-    gamma = uom.gamma
-    tau = uom.tau
+    eta = uom.descriptor.eta
+    gamma = uom.descriptor.gamma
+    tau = uom.descriptor.tau
+    m = uom.m
     assert fv.shape == fv_prime.shape, 'The feature vectors must be the same shape.'
     m_prime = m + eta * ((gamma ** tau) * fv_prime - m * fv) * np.transpose(fv)
     assert m_prime.shape == m.shape, 'The updated matrix M\' must have the same shape as the previous matrix M.'
     return m_prime
 
 
-def update_u(uom, u, fv):
+def update_u(uom, fv):
     """Given the current matrix U and the previous feature vector fv, return the updated matrix U."""
-    eta = uom.eta
+    eta = uom.descriptor.eta
+    u = uom.u
     u_prime = u + eta * (fv - u * fv) * np.transpose(fv)
     assert u_prime.shape == u.shape, 'The updated matrix U\' must have the same shape as the previous matrix U.'
     return u_prime
