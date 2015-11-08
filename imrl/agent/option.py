@@ -4,7 +4,7 @@
 from collections import namedtuple
 
 # First Party
-from imrl.agent.policy import policy_primitive
+from imrl.agent.policy_option import policy_primitive
 from imrl.agent.uom import uom_primitive
 
 OptionDescriptor = namedtuple('OptionDescriptor', ('policy', 'is_terminal'))

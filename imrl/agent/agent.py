@@ -7,7 +7,7 @@ from collections import namedtuple
 from pyrsistent import pvector
 
 # First party
-from imrl.agent.policy import policy_random
+from imrl.agent.policy_agent import policy_random
 from imrl.agent.option import option_primitive
 from imrl.agent.fa.func_approx import tabular_function_approximator
 from imrl.agent.uom import update_m, update_u, UOM
