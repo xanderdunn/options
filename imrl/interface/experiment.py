@@ -63,7 +63,7 @@ def episode_results_generator(agent, environment):
 def start(num_episodes, agent, environment, results_descriptor):
     """Kick off the execution of an experiment."""
     initialize_results(results_descriptor)
-    episode_results = islice(episode_results_generator(num_episodes, agent, environment), num_episodes)
+    episode_results = islice(episode_results_generator(agent, environment), num_episodes)
     results_episode_chunks = chunked(episode_results, results_descriptor.interval)
     for chunk in results_episode_chunks:
         results = [episode_data.results for episode_data in chunk]
