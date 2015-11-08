@@ -19,11 +19,6 @@ EpisodeData = namedtuple('EpisodeData', ('agent', 'results', 'episode_id'))
 StepData = namedtuple('StepData', ('state', 'step_id', 'agent'))
 
 
-def episode_id_generator(num_episodes):
-    """Return a generator for all episode IDs."""
-    return (i for i in range(num_episodes))
-
-
 def run_step(step_data, environment):
     """Given the current state, choose an action to take and return the new environment state."""
     state = step_data.state
