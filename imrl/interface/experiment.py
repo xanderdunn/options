@@ -15,6 +15,7 @@ from imrl.utils.results_writer import write_results, merge_results, initialize_r
 from imrl.utils.iterators import iterate_results
 from imrl.environment.gridworld import Position
 from imrl.agent.agent import Agent
+from imrl.agent.value_iteration import initial_theta
 
 
 ExperimentDescriptor = namedtuple('ExperimentDescriptor', ('num_value_iterations',        # Number of value iteration passes to run
@@ -44,15 +45,23 @@ def generate_state(agent, environment):
     return iterate(lambda step_data: run_step(step_data, environment), initial_step_data)
 
 
+def run_value_iteration(episode_id, agent, environment, num_value_iterations, value_iterations_interval):
+    """Execute value iteration and return an updated Agent with the computed_policy."""
+    if episode_id % value_iterations_interval == 0:
+        uoms = [option.uom for option in agent.options]
+        value_iteration_generator = iterate_results(lambda computed_policy_theta: agent.descriptor.compute_policy(computed_policy_theta, agent.descriptor.learning_rate, environment.reward_vector, uoms, environment.exhaustive_states), initial_theta(len(environment.exhaustive_states)))
+        computed_policy = last(islice(value_iteration_generator, num_value_iterations))
+        # TODO: I shouldn't need to create a new Agent object here, it should be in some API in the agent module
+        return Agent(agent.descriptor, agent.options, computed_policy)
+    else:
+        return agent
+
+
 def run_episode(episode_id, initial_agent, environment, num_value_iterations, value_iterations_interval):
     """Run through a single episode to termination.  Returns the results for that episode."""
     logging.info('Starting episode {}'.format(episode_id))
-    if episode_id % value_iterations_interval == 0:  # Perform value iteration
-        # TODO: Don't mutate agent and don't create an Agent object here
-        uoms = [option.uom for option in initial_agent.options]
-        computed_policy_theta = islice(iterate_results(lambda computed_policy_theta: initial_agent.descriptor.compute_policy(computed_policy_theta, initial_agent.descriptor.learning_rate, environment.reward_vector, uoms, environment.exhaustive_states), initial_agent.computed_policy), num_value_iterations)
-        initial_agent = Agent(initial_agent.descriptor, initial_agent.options, last(computed_policy_theta))
-    for step_data in generate_state(initial_agent, environment):
+    value_iterated_agent = run_value_iteration(episode_id, initial_agent, environment, num_value_iterations, value_iterations_interval)
+    for step_data in generate_state(value_iterated_agent, environment):
         if step_data.state.is_terminal:
             agent = step_data.agent
             terminal_agent = agent.descriptor.terminal_update(agent, step_data.action, step_data.state)
@@ -60,8 +69,6 @@ def run_episode(episode_id, initial_agent, environment, num_value_iterations, va
             assert step_data.state.position == Position(environment.size - 1, environment.size - 1)
             assert step_data.state.value == step_data.state.position.x + step_data.state.position.y * environment.size
             return EpisodeData(terminal_agent, results, episode_id)
-        else:
-            logging.debug(step_data)
 
 
 def episode_results_generator(agent, environment, experiment_description):
