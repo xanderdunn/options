@@ -39,7 +39,7 @@ def update_m(uom, fv, fv_prime, tau):
     gamma = uom.descriptor.gamma
     m = uom.m
     assert fv.shape == fv_prime.shape, 'The feature vectors must be the same shape.'
-    m_prime = m + eta * ((gamma ** tau) * fv_prime - np.dot(m, fv)) * np.transpose(fv)
+    m_prime = m + eta * ((gamma ** tau) * fv_prime - np.dot(m, fv)) * fv.T
     assert m_prime.shape == m.shape, 'The updated matrix M\' must have the same shape as the previous matrix M.'
     return m_prime
 
@@ -48,6 +48,6 @@ def update_u(uom, fv):
     """Given the current matrix U and the previous feature vector fv, return the updated matrix U."""
     eta = uom.descriptor.eta
     u = uom.u
-    u_prime = u + eta * (fv - np.dot(u, fv)) * np.transpose(fv)
+    u_prime = u + eta * (fv - np.dot(u, fv)) * fv.T
     assert u_prime.shape == u.shape, 'The updated matrix U\' must have the same shape as the previous matrix U.'
     return u_prime

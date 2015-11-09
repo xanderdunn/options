@@ -30,7 +30,7 @@ def update_theta_single(theta, alpha, f, uoms, fv):
 
 def policy(f, uoms, fv, theta):
     """Given reward function f, feature vector fv, universal option model matrixes u and m, and theta."""
-    values = [np.transpose(f) * uom.u * fv + uom.descriptor.gamma * np.transpose(uom.m * fv) * theta for uom in uoms]
+    values = [f.T * uom.u * fv + uom.descriptor.gamma * (uom.m * fv).T * theta for uom in uoms]
     max_value = max(values)
     max_value_actions = [i for i, x in enumerate(values) if x == max_value]
     return random.choice(max_value_actions)
