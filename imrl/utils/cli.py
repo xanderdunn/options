@@ -30,6 +30,7 @@ def parse_args(argv):
     parser.add_argument('--gamma', help='Discount factor of the option\'s UOMs', type=float, default=0.999)
     parser.add_argument('--vi_interval', help='Execute value iteration after every n episodes', type=int, default=5)
     parser.add_argument('--num_vi', help='Number of iterations of value iteration to perform at each interval vi_interval.', type=int, default=5)
+    parser.add_argument('--vi_ex_start', help='Begin to execute the value iteration policy after n episodes.', type=int, default=None)
     parser.add_argument('--agent_policy', help='Choose the agent\'s policy.', choices=['random'], default='random')
     # Environment
     parser.add_argument('--environment', help='Choose the environment.', choices=['gridworld'], default='gridworld')
@@ -55,7 +56,7 @@ def main(argv):
     environment = (args.environment == 'gridworld' and gridworld_discrete(args.gridworld_size))
     agent = (args.agent_policy == 'random' and agent_random_tabular(args.gridworld_size ** 2, environment.num_actions, args.alpha, args.eta, args.gamma))
     results_descriptor = ResultsDescriptor(args.results_interval, args.results_path, ['episode_id', 'steps'])
-    experiment_descriptor = ExperimentDescriptor(args.num_vi, args.vi_interval, args.episodes)
+    experiment_descriptor = ExperimentDescriptor(args.num_vi, args.vi_interval, args.episodes, args.vi_ex_start)
     start(experiment_descriptor, agent, environment, results_descriptor)
 
 
