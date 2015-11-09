@@ -7,11 +7,10 @@ from collections import namedtuple
 from functools import reduce
 
 # Third party
-from scipy.sparse import csc_matrix
 from pyrsistent import v, pmap
 from cytoolz.itertoolz import interleave
 from more_itertools import chunked
-import numpy
+import numpy as np
 
 
 ResultsDescriptor = namedtuple('ResultsDescriptor', ('interval', 'output_path', 'keys'))
@@ -19,7 +18,7 @@ ResultsDescriptor = namedtuple('ResultsDescriptor', ('interval', 'output_path', 
 
 def read_results(results_path):
     """Read into a numpy array all the values in the given file path."""
-    return numpy.loadtxt(results_path, skiprows=1)
+    return np.loadtxt(results_path, skiprows=1)
 
 
 def results_logger():
@@ -74,7 +73,7 @@ def write_results(results, results_descriptor):
     keys = results_descriptor.keys
     value_vectors = (results[key] for key in keys)
     rows = chunked(interleave(value_vectors), len(keys))
-    string_rows = map(lambda v: ' '.join(str(x.toarray()) + '\n' if isinstance(x, csc_matrix) else str(x) for x in v), rows)
+    string_rows = map(lambda v: ' '.join(str(x) for x in v), rows)
     all_string_rows = '\n'.join(string_row for string_row in string_rows)
     keys_string = ' '.join(key for key in keys)
     output_stdout(keys_string + '\n' + all_string_rows, output_path)

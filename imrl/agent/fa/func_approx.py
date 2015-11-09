@@ -1,7 +1,7 @@
 """Function approximator. Maps input vectors to feature vectors that approximate the input function."""
 
-import numpy as np
-from scipy.sparse import csc_matrix
+# First party
+from imrl.utils.linear_algebra import sparse_one_hot_vector
 
 
 def tabular_function_approximator(state, num_states):
@@ -9,13 +9,4 @@ def tabular_function_approximator(state, num_states):
     assert isinstance(num_states, int), 'The discrete state space must be an int'
     assert isinstance(state, int), 'Received state {}, but the state provided to the tabular function approximator must be an int'.format(state)
     assert state <= num_states and state >= 0, 'Given state {} with num_states {} is not possible'.format(state, num_states)
-    zero_vector = np.zeros((num_states, 1))
-    zero_vector[state, 0] = 1.0
-    return csc_matrix(zero_vector)
-
-
-class FunctionApproximator:
-
-    def __init__(self, input_dim, feature_dim):
-        self.input_dim = input_dim
-        self.feature_dim - feature_dim
+    return sparse_one_hot_vector(num_states, state)

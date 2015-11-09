@@ -1,7 +1,6 @@
 """Universal option model (UOM). Manages learning and inference for UOMs."""
 
 # System
-from scipy.sparse import csc_matrix
 from collections import namedtuple
 
 # Third party
@@ -23,12 +22,12 @@ def uom_primitive(fv_size):
 
 def initial_m(fv_size):
     """The initial M matrix is all zeros."""
-    return csc_matrix((fv_size, fv_size), dtype=np.float64)
+    return np.zeros((fv_size, fv_size))
 
 
 def initial_u(fv_size):
     """The initial U matrix is all zeros."""
-    return csc_matrix((fv_size, fv_size), dtype=np.float64)
+    return np.zeros((fv_size, fv_size))
 
 
 def converged(m, m_prime, u, u_prime, epsilon):
@@ -43,7 +42,7 @@ def update_m(uom, fv, fv_prime):
     tau = uom.descriptor.tau
     m = uom.m
     assert fv.shape == fv_prime.shape, 'The feature vectors must be the same shape.'
-    m_prime = m + eta * ((gamma ** tau) * fv_prime - m * fv) * np.transpose(fv)
+    m_prime = m + eta * ((gamma ** tau) * fv_prime - np.dot(m, fv)) * np.transpose(fv)
     assert m_prime.shape == m.shape, 'The updated matrix M\' must have the same shape as the previous matrix M.'
     return m_prime
 
@@ -52,6 +51,6 @@ def update_u(uom, fv):
     """Given the current matrix U and the previous feature vector fv, return the updated matrix U."""
     eta = uom.descriptor.eta
     u = uom.u
-    u_prime = u + eta * (fv - u * fv) * np.transpose(fv)
+    u_prime = u + eta * (fv - np.dot(u, fv)) * np.transpose(fv)
     assert u_prime.shape == u.shape, 'The updated matrix U\' must have the same shape as the previous matrix U.'
     return u_prime

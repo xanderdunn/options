@@ -5,6 +5,9 @@ from collections import namedtuple
 from enum import Enum
 import random
 
+# First party
+from imrl.utils.linear_algebra import sparse_one_hot_vector
+
 
 class Action(Enum):
     """Possible actions that can be taken in the gridworld."""
@@ -13,14 +16,29 @@ class Action(Enum):
     left = 2
     right = 3
 
-Gridworld = namedtuple("Gridworld", ('size',            # The gridworld is size * size
-                                     'failure_rate',    # The probability that any action will fail
-                                     'take_action',     # Function to call to apply an action to the environment
-                                     'num_actions',     # Total number of possible actions the agent can take
-                                     'initial_state'))  # State where the agent begins each episode
+Gridworld = namedtuple("Gridworld", ('size',                # The gridworld is size * size
+                                     'failure_rate',        # The probability that any action will fail
+                                     'take_action',         # Function to call to apply an action to the environment
+                                     'num_actions',         # Total number of possible actions the agent can take
+                                     'initial_state',       # State where the agent begins each episode
+                                     'reward_vector',       # The reward function represented as a vector
+                                     'exhaustive_states'))  # Exhaustive list of possible states for a discrete tabular environment
 
 Position = namedtuple('Position', ('x', 'y'))
 State = namedtuple("State", ('position', 'value', 'is_terminal', 'reward'))
+
+
+def gridworld_discrete(size):
+    """Return a discrete gridworld environment."""
+    return Gridworld(size, 0.0, take_action, 4, initial_state, reward_vector(size * size), exhaustive_states(size * size))
+
+
+def exhaustive_states(num_states):
+    return [sparse_one_hot_vector(num_states, i) for i in range(num_states)]
+
+
+def reward_vector(num_states):
+    return sparse_one_hot_vector(num_states, num_states - 1)
 
 
 def initial_state():

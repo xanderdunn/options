@@ -17,7 +17,7 @@ def test_m_update():
     m_prime = update_m(uom, fv, fv_prime)
     zeros_matrix = np.zeros((9, 9))
     zeros_matrix[1, 0] = uom.descriptor.gamma
-    assert np.array_equal(zeros_matrix, m_prime.toarray())
+    assert np.array_equal(zeros_matrix, m_prime)
 
 
 def test_u_update():
@@ -28,4 +28,4 @@ def test_u_update():
     u_prime = update_u(uom, fv)
     zeros_matrix = np.zeros((9, 9))
     zeros_matrix[0, 0] = 1
-    assert np.array_equal(zeros_matrix, u_prime.toarray())
+    assert np.array_equal(zeros_matrix, u_prime)
