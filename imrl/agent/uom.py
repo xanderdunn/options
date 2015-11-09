@@ -9,14 +9,12 @@ import numpy as np
 
 UOMDescriptor = namedtuple('UOMDescriptor', ('eta',      # learning rate
                                              'gamma',    # Discount factor
-                                             'tau',      # time taken for the option to execute
-                                             'converged',
-                                             'epsilon'))
+                                             'converged'))
 UOM = namedtuple('UOM', ('descriptor', 'm', 'u'))
 
 
-def uom_primitive(fv_size):
-    descriptor = UOMDescriptor(1.0, 0.999, 1.0, converged, 0.001)
+def uom_primitive(fv_size, eta, gamma):
+    descriptor = UOMDescriptor(eta, gamma, converged)
     return UOM(descriptor, initial_m(fv_size), initial_u(fv_size))
 
 
@@ -35,11 +33,10 @@ def converged(m, m_prime, u, u_prime, epsilon):
     return (m - m_prime < epsilon) or False
 
 
-def update_m(uom, fv, fv_prime):
+def update_m(uom, fv, fv_prime, tau):
     """Given the current matrix M, the previous feature vector fv, and the next feature vector fv_prime, return the updated matrix M."""
     eta = uom.descriptor.eta
     gamma = uom.descriptor.gamma
-    tau = uom.descriptor.tau
     m = uom.m
     assert fv.shape == fv_prime.shape, 'The feature vectors must be the same shape.'
     m_prime = m + eta * ((gamma ** tau) * fv_prime - np.dot(m, fv)) * np.transpose(fv)

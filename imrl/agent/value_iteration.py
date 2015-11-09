@@ -16,7 +16,7 @@ def update_theta(theta, alpha, f, uoms, fvs):
     """Given the previous value iteration theta, learning rate alpha, reward function f, universal option model matrices u and m, feature vector sample set fv, and discount factor gamma, return the updated value iteration theta_prime."""
     # TODO: What is an elegant way to remove this mutable state?
     theta_prime = theta
-    for fv in fvs:
+    for fv in reversed(fvs):
         theta_prime = update_theta_single(theta_prime, alpha, f, uoms, fv)
     return theta_prime
 

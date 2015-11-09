@@ -11,10 +11,10 @@ OptionDescriptor = namedtuple('OptionDescriptor', ('policy', 'is_terminal'))
 Option = namedtuple('Option', ('descriptor', 'uom'))
 
 
-def option_primitive(fv_size):
+def option_primitive(fv_size, eta, gamma):
     """An option with primitive actions where it is always in the terminal state and always executes exactly the primitive action."""
     descriptor = OptionDescriptor(policy_primitive, is_terminal_always)
-    return Option(descriptor, uom_primitive(fv_size))
+    return Option(descriptor, uom_primitive(fv_size, eta, gamma))
 
 
 def get_next_feature(fv):
