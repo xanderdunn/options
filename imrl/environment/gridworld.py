@@ -28,9 +28,9 @@ Position = namedtuple('Position', ('x', 'y'))
 State = namedtuple("State", ('position', 'value', 'is_terminal', 'reward'))
 
 
-def gridworld_discrete(size):
+def gridworld_discrete(size, failure_rate):
     """Return a discrete gridworld environment."""
-    return Gridworld(size, 0.0, take_action, 4, initial_state, reward_vector(size * size), exhaustive_states(size * size))
+    return Gridworld(size, failure_rate, take_action, 4, initial_state, reward_vector(size * size), exhaustive_states(size * size))
 
 
 def exhaustive_states(num_states):

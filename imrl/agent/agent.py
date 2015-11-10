@@ -16,15 +16,22 @@ from imrl.agent.value_iteration import update_theta, initial_theta
 
 
 # TODO: I need types that I can inherit from
-AgentDescriptor = namedtuple('AgentDescriptor', ('policy', 'decide_action', 'num_states', 'feature_vector', 'update', 'compute_policy', 'learning_rate', 'terminal_update'))
+AgentDescriptor = namedtuple('AgentDescriptor', ('policy', 'decide_action', 'num_states', 'feature_vector', 'update', 'compute_policy', 'learning_rate', 'terminal_update', 'switch_policy'))
 Agent = namedtuple('Agent', ('descriptor',  # An AgentDescriptor object that describes all the agent's parameters
                              'options',     # A PVector of options, one for each action in the environment this agent operates in
                              'computed_policy'))     # A value iteration-computed policy
 
 
+def switch_policy(agent, new_policy):
+    """Given an agent and a new policy, switch the agent over to using the new policy."""
+    descriptor = agent.descriptor
+    new_descriptor = AgentDescriptor(new_policy, descriptor.decide_action, descriptor.num_states, descriptor.feature_vector, descriptor.update, descriptor.compute_policy, descriptor.learning_rate, descriptor.terminal_update, descriptor.switch_policy)
+    return Agent(new_descriptor, agent.options, agent.computed_policy)
+
+
 def agent_random_tabular(num_states, num_actions, learning_rate, eta, gamma):
     """An agent with a random policy."""
-    descriptor = AgentDescriptor(policy_random, decide_action, num_states, tabular_feature_vector, update_options_agent, update_theta, learning_rate, terminal_update)
+    descriptor = AgentDescriptor(policy_random, decide_action, num_states, tabular_feature_vector, update_options_agent, update_theta, learning_rate, terminal_update, switch_policy)
     options = pvector([option_primitive(num_states, eta, gamma) for i in range(num_actions)])
     return Agent(descriptor, options, initial_theta(num_states))
 
@@ -64,6 +71,6 @@ def updated_agent(agent, action, option, uom, u, m):
     return Agent(agent.descriptor, options_prime, agent.computed_policy)
 
 
-def decide_action(policy, state, num_actions):
+def decide_action(agent, state, num_actions, reward_function):
     """Receive the environment's latest state and return an action to take."""
-    return policy(state, num_actions)
+    return agent.descriptor.policy(agent, state, num_actions, reward_function)
