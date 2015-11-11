@@ -1,38 +1,45 @@
-# -*- coding: utf-8 -*-
 """Radial basis function approximator."""
 
-# Set positions of Gaussians in a 2D grid.
-# No state space that is zero for all RBFs
-# Feature vector is the gaussian of all the rbfs
-# Dimensions from 0 to 1
-# Evenly tile all the dimensions
-# Parameter d is how many RBFs I want across a single dimension
-# You'll have d^n RBFs where n is the number of dimensions.  d**2 for a 2D gridworld
-
 # Third party
+import numpy as np
+from itertools import product
 from scipy.linalg import norm
-from scipy import random, zeros, exp
-
-# This class was adapted from Thomas Rückstieß at http://www.rueckstiess.net/research/snippets/show/72d2363e
-
+import matplotlib.pyplot as plt
 
 class RBF:
 
-    def __init__(self, indim, numCenters):
-        self.indim = indim
-        self.numCenters = numCenters
-        # TODO: Use linspace from 0 to 1 across each dimension
-        self.centers = [random.uniform(-1, 1, indim) for i in range(numCenters)]
-        self.beta = 8
+    def __init__(self, dim, resolution, min_val=0, max_val=1, eps=8):
+        self.dim = dim
+        self.num_centers = resolution**dim
+        self.min_val = min_val
+        self.max_val = max_val
+        self.eps = eps
 
-    def _basisfunc(self, c, d):
-        assert len(d) == self.indim
-        return exp(-self.beta * norm(c - d) ** 2)
+        # Segment the space based on resolution
+        segmentation = [np.linspace(min_val, max_val, resolution).tolist()]*dim
 
-    def calculate_activations(self, X):
-        # calculate activations of RBFs
-        G = zeros((X.shape[0], self.numCenters), float)
+        # Generate centers from Cartiesian product of segmentation lists
+        centers = product(*segmentation)
+        self.centers = [np.asarray(a) for a in centers]
+
+    def _eval(self, c, x):
+        """Evaluate an RBF kernel c at a given point x."""
+        return np.exp(-self.eps * norm(c - x) ** 2)
+
+    def get_features(self, s):
+        """Get the feature vector for a given state s."""
+        assert len(s) == self.dim
+        for i in range(len(s)):
+            assert self.min_val <= s[i] <= self.max_val
+        fv = np.zeros((self.num_centers, 1))
         for ci, c in enumerate(self.centers):
-            for xi, x in enumerate(X):
-                G[xi, ci] = self._basisfunc(c, x)
-        return G
+            fv[ci] = self._eval(c, s)
+        return fv
+
+
+if __name__ == '__main__':
+    rbfs = RBF(2, 5)
+    fv = rbfs.get_features(np.asarray([0.5, 0.5]))
+    print(fv)
+    plt.plot(range(rbfs.num_centers), fv)
+    plt.show()
