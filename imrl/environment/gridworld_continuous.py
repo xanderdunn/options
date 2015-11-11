@@ -2,42 +2,37 @@
 
 # System
 from collections import namedtuple
-from enum import Enum
+
+# Third party
 import numpy as np
 
-class Action(Enum):
-    """Possible actions that can be taken in the gridworld."""
-    up = 0
-    down = 1
-    left = 2
-    right = 3
+# First party
+from imrl.environment.gridworld import Position, Action, State, reward
 
-ContinuousGridworld = namedtuple("ContinuousGridworld", (
-                                    'move_mean',           # Mean of distance moved when taking an action
-                                    'move_sd',                    # Standard deviation of distance moved when taking an action
-                                    'take_action',         # Function to call to apply an action to the environment
-                                    'num_actions',         # Total number of possible actions the agent can take
-                                    'initial_state',       # State where the agent begins each episode
-                                    'reward_center',       # The center point of the goal region
-                                    'reward_radius'))      # The radius of the goal region
 
-Position = namedtuple('Position', ('x', 'y'))
-State = namedtuple("State", ('position', 'is_terminal', 'reward'))
+GridworldContinuous = namedtuple('GridworldContinuous', (
+                                 'move_mean',           # Mean of distance moved when taking an action
+                                 'move_sd',             # Standard deviation of distance moved when taking an action
+                                 'take_action',         # Function to call to apply an action to the environment
+                                 'num_actions',         # Total number of possible actions the agent can take
+                                 'initial_state',       # State where the agent begins each episode
+                                 'reward_center',       # The center point of the goal region
+                                 'reward_radius',       # The radius of the goal region
+                                 'is_terminal',         # Function to check if a given state is terminal
+                                 'reward'))             # Function to call to calculate the reward for a given state
 
 
 def gridworld_continuous(move_mean, move_sd):
     """Return a discrete gridworld environment."""
-    return ContinuousGridworld(move_mean, move_sd, take_action, 4, initial_state, Position(0.95, 0.95), 0.02)
+    return GridworldContinuous(move_mean, move_sd, take_action, 4, initial_state(), Position(0.95, 0.95), 0.02)
 
 
 def initial_state():
     """The state in which the agent starts at the beginning of each episode."""
-    return State(Position(max(np.random.normal(0, 0.01), 0), max(np.random.normal(0, 0.01), 0)), False, 0)
-
-
-def reward(position, environment):
-    """Calculate the reward based on the previous and new positions."""
-    return (is_terminal(position, environment) and 1) or 0
+    x_pos = max(np.random.normal(0, 0.01), 0)
+    y_pos = max(np.random.normal(0, 0.01), 0)
+    position = Position(x_pos, y_pos)
+    return State(position, False, 0)
 
 
 def is_terminal(position, environment):
@@ -57,14 +52,5 @@ def take_action(current_state, action, environment):
                     (mapped_action == Action.left and Position(posx + move, posy + noise)) or \
                     (mapped_action == Action.right and Position(posx - move, posy + noise))
     new_pos = Position(min(1, max(tentative_pos.x, 0)), min(1, max(tentative_pos.y, 0)))
-    return State(new_pos, is_terminal(new_pos, environment), reward(new_pos, environment))
-
-if __name__ == '__main__':
-    env = ContinuousGridworld(0.05, 0.01, take_action, 4, initial_state, Position(0.95, 0.95), 0.02)
-    s = env.initial_state()
-    steps = 0
-    while not is_terminal(s.position, env):
-        s = take_action(s, np.random.randint(4), env)
-        print(s.position)
-        steps +=1
-    print(steps)
+    is_terminal = environment.is_terminal(new_pos, environment)
+    return State(new_pos, is_terminal, reward(new_pos, is_terminal))

@@ -15,7 +15,7 @@ def policy_random(agent, state, num_actions, reward_function):
 def policy_value_iteration(agent, state, num_actions, reward_function):
     """Given reward function f, feature vector fv, universal option model matrixes u and m, and theta."""
     f = reward_function
-    fv = agent.descriptor.feature_vector(state.value, agent.descriptor.num_states)
+    fv = agent.descriptor.feature_vector(state, agent.descriptor.num_states)
     theta = agent.computed_policy
     uoms = [option.uom for option in agent.options]
     values = [value_iteration.scalar(theta, f, uom, fv) for uom in uoms]

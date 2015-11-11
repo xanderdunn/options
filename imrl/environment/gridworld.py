@@ -25,7 +25,7 @@ Gridworld = namedtuple("Gridworld", ('size',                # The gridworld is s
                                      'exhaustive_states'))  # Exhaustive list of possible states for a discrete tabular environment
 
 Position = namedtuple('Position', ('x', 'y'))
-State = namedtuple("State", ('position', 'value', 'is_terminal', 'reward'))
+State = namedtuple("State", ('position', 'is_terminal', 'reward'))
 
 
 def gridworld_discrete(size, failure_rate):
@@ -43,18 +43,18 @@ def reward_vector(num_states):
 
 def initial_state():
     """The state in which the agent starts at the beginning of each episode."""
-    return State(Position(0, 0), 0, False, None)
+    return State(Position(0, 0), False, 0)
 
 
-def reward(position, environment):
+def reward(position, is_terminal):
     """Calculate the reward based on the previous and new positions."""
-    return (is_terminal(position, environment) and 1) or \
-           (0)
+    return (is_terminal and 1) or (0)
 
 
 def is_terminal(position, environment):
     """Is this position terminal?  That is, is it in the upper left corner?"""
-    return position == Position(environment.size - 1, environment.size - 1)
+    coordinate = environment.size - 1
+    return position == Position(coordinate, coordinate)
 
 
 def take_action(current_state, size, action, environment):
@@ -70,6 +70,7 @@ def take_action(current_state, size, action, environment):
         new_pos = ((tentative_pos.x >= 0 and tentative_pos.y >= 0 and
                     tentative_pos.y < environment.size and tentative_pos.x < environment.size) and tentative_pos) or \
                   (current_state.position)
-        return State(new_pos, new_pos.x + size * new_pos.y, is_terminal(new_pos, environment), 0)
+        terminal = is_terminal(new_pos, environment)
+        return State(new_pos, terminal, reward(new_pos, terminal))
     else:
-        return State(current_state.position, current_state.value, is_terminal(current_state.position, environment), 0)
+        return current_state
