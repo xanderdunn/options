@@ -16,7 +16,7 @@ import numpy as np
 def test_taking_actions():
     """Does the environment correctly change the state when told to take an action with and without stochasticity?"""
     random.seed()
-    env = GridworldContinuous(0.05, 0.01, take_action, 4, initial_state, Position(0.95, 0.95), 0.02, is_terminal, reward)
+    env = GridworldContinuous(0.05, 0.01, take_action, 4, initial_state, Position(0.95, 0.95), 0.02)
     start = env.initial_state()
     ratio = ratio_test(lambda state: np.linalg.norm(np.asarray([state.position.x - start.position.x,
                                                                 state.position.y - (start.position.y + env.move_mean)]),
@@ -33,6 +33,6 @@ def test_taking_actions():
 
 def test_termination():
     """Does the environment terminate in the correct state?"""
-    environment = GridworldContinuous(0.05, 0.01, take_action, 4, initial_state, Position(0.95, 0.95), 0.02, is_terminal, reward)
+    environment = GridworldContinuous(0.05, 0.01, take_action, 4, initial_state, Position(0.95, 0.95), 0.02)
     assert not is_terminal(Position(0, 0), environment)
     assert is_terminal(Position(0.96, 0.94), environment)

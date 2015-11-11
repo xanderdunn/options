@@ -17,9 +17,7 @@ GridworldContinuous = namedtuple('GridworldContinuous', (
                                  'num_actions',         # Total number of possible actions the agent can take
                                  'initial_state',       # State where the agent begins each episode
                                  'reward_center',       # The center point of the goal region
-                                 'reward_radius',       # The radius of the goal region
-                                 'is_terminal',         # Function to check if a given state is terminal
-                                 'reward'))             # Function to call to calculate the reward for a given state
+                                 'reward_radius'))      # The radius of the goal region
 
 
 def gridworld_continuous(move_mean, move_sd):
@@ -52,5 +50,5 @@ def take_action(current_state, action, environment):
                     (mapped_action == Action.left and Position(posx + move, posy + noise)) or \
                     (mapped_action == Action.right and Position(posx - move, posy + noise))
     new_pos = Position(min(1, max(tentative_pos.x, 0)), min(1, max(tentative_pos.y, 0)))
-    is_terminal = environment.is_terminal(new_pos, environment)
-    return State(new_pos, is_terminal, reward(new_pos, is_terminal))
+    terminal = is_terminal(new_pos, environment)
+    return State(new_pos, terminal, reward(new_pos, terminal))
