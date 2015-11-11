@@ -1,2 +1,1 @@
 """Continuous gridworld environment."""
-

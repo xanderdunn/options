@@ -1,49 +1,75 @@
 """Discrete gridworld environment."""
 
 # System
-import logging
 from collections import namedtuple
 from enum import Enum
 import random
 
+# First party
+from imrl.utils.linear_algebra import sparse_one_hot_vector
+
 
 class Action(Enum):
-    '''Possible actions that can be taken in the gridworld.'''
+    """Possible actions that can be taken in the gridworld."""
     up = 0
     down = 1
     left = 2
     right = 3
 
-Gridworld = namedtuple("Gridworld", ('size',            # The gridworld is size * size
-                                     'failure_rate'))   # The probability that any action will fail
+Gridworld = namedtuple("Gridworld", ('size',                # The gridworld is size * size
+                                     'failure_rate',        # The probability that any action will fail
+                                     'take_action',         # Function to call to apply an action to the environment
+                                     'num_actions',         # Total number of possible actions the agent can take
+                                     'initial_state',       # State where the agent begins each episode
+                                     'reward_vector',       # The reward function represented as a vector
+                                     'exhaustive_states'))  # Exhaustive list of possible states for a discrete tabular environment
 
 Position = namedtuple('Position', ('x', 'y'))
-State = namedtuple("State", ('position', 'is_terminal', 'reward'))
+State = namedtuple("State", ('position', 'value', 'is_terminal', 'reward'))
+
+
+def gridworld_discrete(size, failure_rate):
+    """Return a discrete gridworld environment."""
+    return Gridworld(size, failure_rate, take_action, 4, initial_state, reward_vector(size * size), exhaustive_states(size * size))
+
+
+def exhaustive_states(num_states):
+    return [sparse_one_hot_vector(num_states, i) for i in range(num_states)]
+
+
+def reward_vector(num_states):
+    return sparse_one_hot_vector(num_states, num_states - 1)
+
+
+def initial_state():
+    """The state in which the agent starts at the beginning of each episode."""
+    return State(Position(0, 0), 0, False, None)
 
 
 def reward(position, environment):
-    '''Calculate the reward based on the previous and new positions.'''
+    """Calculate the reward based on the previous and new positions."""
     return (is_terminal(position, environment) and 1) or \
            (0)
 
 
 def is_terminal(position, environment):
-    '''Is this position terminal?  That is, is it in the upper left corner?'''
+    """Is this position terminal?  That is, is it in the upper left corner?"""
     return position == Position(environment.size - 1, environment.size - 1)
 
 
-def take_action(current_state, action, environment):
-    '''Apply the given action and return the new state.'''
+def take_action(current_state, size, action, environment):
+    """Apply the given action and return the new state."""
     posx = current_state.position.x
     posy = current_state.position.y
     if random.random() > environment.failure_rate:
-        tentative_pos = (action == Action.up and Position(posx, posy + 1)) or \
-                        (action == Action.down and Position(posx, posy - 1)) or \
-                        (action == Action.left and Position(posx + 1, posy)) or \
-                        (action == Action.right and Position(posx - 1, posy))
+        mapped_action = Action(action)
+        tentative_pos = (mapped_action == Action.up and Position(posx, posy + 1)) or \
+                        (mapped_action == Action.down and Position(posx, posy - 1)) or \
+                        (mapped_action == Action.left and Position(posx + 1, posy)) or \
+                        (mapped_action == Action.right and Position(posx - 1, posy))
         new_pos = ((tentative_pos.x >= 0 and tentative_pos.y >= 0 and
                     tentative_pos.y < environment.size and tentative_pos.x < environment.size) and tentative_pos) or \
                   (current_state.position)
-        return State(new_pos, is_terminal(new_pos, environment), 0)
+        return State(new_pos, new_pos.x + size * new_pos.y, is_terminal(new_pos, environment), 0)
     else:
-        return State(current_state.position, is_terminal(current_state.position, environment), 0)
+        return State(current_state.position, current_state.value, is_terminal(current_state.position, environment), 0)
