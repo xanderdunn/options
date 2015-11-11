@@ -71,7 +71,6 @@ def run_episode(episode_id, initial_agent, environment, num_value_iterations, va
             terminal_agent = agent.descriptor.terminal_update(agent, step_data.action, step_data.state)
             results = m(episode_id=episode_id, steps=step_data.step_id)
             assert step_data.state.position == Position(environment.size - 1, environment.size - 1)
-            assert step_data.state.value == step_data.state.position.x + step_data.state.position.y * environment.size
             return EpisodeData(terminal_agent, results, episode_id)
 
 

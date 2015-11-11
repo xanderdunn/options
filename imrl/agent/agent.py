@@ -31,19 +31,14 @@ def switch_policy(agent, new_policy):
 
 def agent_random_tabular(num_states, num_actions, learning_rate, eta, gamma):
     """An agent with a random policy."""
-    descriptor = AgentDescriptor(policy_random, decide_action, num_states, tabular_feature_vector, update_options_agent, update_theta, learning_rate, terminal_update, switch_policy)
+    descriptor = AgentDescriptor(policy_random, decide_action, num_states, tabular_function_approximator, update_options_agent, update_theta, learning_rate, terminal_update, switch_policy)
     options = pvector([option_primitive(num_states, eta, gamma) for i in range(num_actions)])
     return Agent(descriptor, options, initial_theta(num_states))
 
 
-def tabular_feature_vector(state, num_states):
-    """Given some state, return the tabular \"function approximation\" of it."""
-    return tabular_function_approximator(state, num_states)
-
-
 def terminal_update(agent, action, state):
     """Called to do any update of the termination state."""
-    fv = agent.descriptor.feature_vector(state.value, agent.descriptor.num_states)
+    fv = agent.descriptor.feature_vector(state, agent.descriptor.num_states)
     options = agent.options
     option = options[action]
     uom = option.uom
@@ -53,8 +48,8 @@ def terminal_update(agent, action, state):
 
 def update_options_agent(agent, action, state, state_prime, tau):
     """Update an agent with options and return the new agent."""
-    fv = agent.descriptor.feature_vector(state.value, agent.descriptor.num_states)
-    fv_prime = agent.descriptor.feature_vector(state_prime.value, agent.descriptor.num_states)
+    fv = agent.descriptor.feature_vector(state, agent.descriptor.num_states)
+    fv_prime = agent.descriptor.feature_vector(state_prime, agent.descriptor.num_states)
     options = agent.options
     option = options[action]
     uom = option.uom
