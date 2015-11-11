@@ -20,7 +20,7 @@ def test_taking_actions():
     start = env.initial_state()
     ratio = ratio_test(lambda state: np.linalg.norm(np.asarray([state.position.x - start.position.x,
                                                                 state.position.y - (start.position.y + env.move_mean)]),
-                                                       2) < env.move_sd*2,
+                                                       2) < env.move_sd * 2,
                        partial(take_action, start, Action.up, env), 10000)
     assert 0.85 < ratio
     steps = 0
