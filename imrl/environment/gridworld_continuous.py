@@ -22,7 +22,7 @@ GridworldContinuous = namedtuple('GridworldContinuous', (
 
 def gridworld_continuous(move_mean, move_sd):
     """Return a discrete gridworld environment."""
-    return GridworldContinuous(move_mean, move_sd, take_action, 4, initial_state(), Position(0.95, 0.95), 0.02)
+    return GridworldContinuous(move_mean, move_sd, take_action, 4, initial_state, Position(0.95, 0.95), 0.02)
 
 
 def initial_state():
