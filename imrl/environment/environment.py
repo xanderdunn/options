@@ -10,7 +10,7 @@ class Environment:
         raise NotImplementedError("Should return reward for transitioning into given state.")
 
     def initial_state(self):
-        raise NotImplementedError("Should return initial state..")
+        raise NotImplementedError("Should return initial state.")
 
     def next_state(self, state, action):
         raise NotImplementedError("Should return next state for given state and action.")

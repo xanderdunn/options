@@ -7,10 +7,10 @@ from imrl.agent.option.uom import UOM
 
 class Option:
 
-    def __init__(self, fa, policy):
+    def __init__(self, fa, policy, alpha, gamma):
         self.fa = fa
         self.policy = policy
-        self.uom = UOM(fa)
+        self.uom = UOM(fa, alpha, gamma)
 
     def get_next_fv(self, fv):
         """Get expected next feature vector given feature vector fv."""

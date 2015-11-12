@@ -6,11 +6,11 @@ import numpy as np
 
 class UOM:
 
-    def __init__(self, fa, eta=0.1, gamma=0.99):
+    def __init__(self, fa, eta, gamma):
         self.m = np.zeros((fa.num_features, fa.num_features))
         self.u = np.zeros((fa.num_features, fa.num_features))
         self.eta = eta
-        self.gamma = 0
+        self.gamma = gamma
 
     def converged(m, m_prime, u, u_prime, epsilon):
         """Check if the model has converged sufficiently."""
