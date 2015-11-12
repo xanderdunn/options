@@ -43,7 +43,7 @@ class Gridworld(Environment):
         return int(position.x + self.size * position.y)
 
     def reward_vector(self):
-        return one_hot_vector(self.num_states(), self.num_states() - 1)
+        return self.num_states() - 1
 
     def reward(self, state):
         """Return 1 if transitioning into corner (size-1, size-1)"""

@@ -32,14 +32,14 @@ def parse_args(argv):
     parser.add_argument('--alpha', help='Value iteration step size.', type=float, default=0.1)
     parser.add_argument('--eta', help='Option model step size.', type=float, default=0.1)
     parser.add_argument('--gamma', help='Discount factor.', type=float, default=0.99)
-    parser.add_argument('--epsilon', help='New state sample distance threshold', type=float, default=0.05)
+    parser.add_argument('--epsilon', help='New state sample distance threshold', type=float, default=0.1)
     parser.add_argument('--vi_interval', help='Execute value iteration after every n episodes', type=int, default=50)
-    parser.add_argument('--num_vi', help='Number of iterations of value iteration to perform at each interval vi_interval.', type=int, default=5)
+    parser.add_argument('--num_vi', help='Number of iterations of value iteration to perform at each interval vi_interval.', type=int, default=1)
     parser.add_argument('--vi_ex_start', help='Begin to execute the value iteration policy after n episodes.', type=int, default=100)
     parser.add_argument('--agent_policy', help='Choose the agent\'s policy.', choices=['random'], default='random')
-    parser.add_argument('--func_approx', help='Choose the agent\'s function approximator.', choices=['tabular', 'rbf'], default='rbf')
+    parser.add_argument('--func_approx', help='Choose the agent\'s function approximator.', choices=['tabular', 'rbf'], default='tabular')
     # Environment
-    parser.add_argument('--environment', help='Choose the environment.', choices=['gridworld', 'gridworld_continuous'], default='gridworld_continuous')
+    parser.add_argument('--environment', help='Choose the environment.', choices=['gridworld', 'gridworld_continuous'], default='gridworld')
     parser.add_argument('--gridworld_size', help='Gridworld is size * size', type=int, default=3)
     parser.add_argument('--failure_rate', help='The percent of actions in this environment that fail.', type=float, default=0.0)
     return parser.parse_args(argv)
@@ -61,7 +61,7 @@ def main(argv):
     random.seed(args.seed)
     logging.basicConfig(level=log_level(args.log_level))
     environment = (args.environment == 'gridworld' and Gridworld(args.gridworld_size, args.failure_rate)) or \
-                  (args.environment == 'gridworld_continuous' and GridworldContinuous(0.1, 0.025))
+                  (args.environment == 'gridworld_continuous' and GridworldContinuous(0.2, 0.05))
     policy = (args.agent_policy == 'random' and RandomPolicy(environment.num_actions))
     fa = (args.func_approx == 'tabular' and TabularFA(environment.size*environment.size)) or \
         (args.func_approx == 'rbf' and RBF(2, 5))

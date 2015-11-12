@@ -8,9 +8,9 @@ import numpy as np
 
 class ValueIteration:
 
-    def __init__(self, reward_function, agent, alpha=0.1, gamma=0.99):
+    def __init__(self, reward_state, agent, alpha=0.1, gamma=0.99):
         self.agent = agent
-        self.r = reward_function
+        self.r = agent.fa.evaluate(reward_state)
         self.alpha = alpha
         self.gamma = gamma
         self.theta = np.zeros((agent.fa.num_features, 1))

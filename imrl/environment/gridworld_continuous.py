@@ -17,6 +17,9 @@ class GridworldContinuous(Environment):
         self.reward_center = reward_center
         self.reward_radius = reward_radius
 
+    def reward_vector(self):
+        return self.reward_center
+
     def reward(self, state):
         return 1.0 if self.is_terminal(state) else 0.0
 
