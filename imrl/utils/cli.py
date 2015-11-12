@@ -10,9 +10,12 @@ import os
 
 # IMRL
 from imrl.interface.experiment import start, ExperimentDescriptor
-from imrl.environment.gridworld import gridworld_discrete
-from imrl.environment.gridworld_continuous import gridworld_continuous
-from imrl.agent.agent import agent_random_tabular
+from imrl.agent.agent import Agent
+from imrl.agent.policy.policy_random import RandomPolicy
+from imrl.agent.fa.tabular import TabularFA
+from imrl.agent.fa.rbf import RBF
+from imrl.environment.gridworld import Gridworld
+from imrl.environment.gridworld_continuous import GridworldContinuous
 from imrl.utils.results_writer import ResultsDescriptor
 
 
@@ -33,6 +36,7 @@ def parse_args(argv):
     parser.add_argument('--num_vi', help='Number of iterations of value iteration to perform at each interval vi_interval.', type=int, default=1)
     parser.add_argument('--vi_ex_start', help='Begin to execute the value iteration policy after n episodes.', type=int, default=None)
     parser.add_argument('--agent_policy', help='Choose the agent\'s policy.', choices=['random'], default='random')
+    parser.add_argument('--func_approx', help='Choose the agent\'s function approximator.', choices=['tabular', 'rbf'], default='tabular')
     # Environment
     parser.add_argument('--environment', help='Choose the environment.', choices=['gridworld', 'gridworld_continuous'], default='gridworld')
     parser.add_argument('--gridworld_size', help='Gridworld is size * size', type=int, default=3)
@@ -55,9 +59,12 @@ def main(argv):
     args = parse_args(argv)
     random.seed(args.seed)
     logging.basicConfig(level=log_level(args.log_level))
-    environment = (args.environment == 'gridworld' and gridworld_discrete(args.gridworld_size, args.failure_rate)) or \
-                  (args.environment == 'gridworld_continuous' and gridworld_continuous(0.05, 0.01))
-    agent = (args.agent_policy == 'random' and agent_random_tabular(args.gridworld_size ** 2, environment.num_actions, args.alpha, args.eta, args.gamma))
+    environment = (args.environment == 'gridworld' and Gridworld(args.gridworld_size, args.failure_rate)) or \
+                  (args.environment == 'gridworld_continuous' and GridworldContinuous(0.05, 0.01))
+    policy = (args.agent_policy == 'random' and RandomPolicy(environment.num_actions))
+    fa = (args.func_approx == 'tabular' and TabularFA(environment.size*environment.size)) or \
+        (args.func_approx == 'rbf' and RBF(2, 5))
+    agent = Agent(policy, fa, environment.num_actions, [])
     results_descriptor = ResultsDescriptor(args.results_interval, args.results_path, ['episode_id', 'steps'])
     experiment_descriptor = ExperimentDescriptor(args.num_vi, args.vi_interval, args.episodes, args.vi_ex_start)
     start(experiment_descriptor, agent, environment, results_descriptor)

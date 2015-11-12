@@ -13,10 +13,7 @@ from cytoolz import last
 # First party
 from imrl.utils.results_writer import write_results, merge_results, initialize_results
 from imrl.utils.iterators import iterate_results
-from imrl.environment.gridworld import Position
 from imrl.agent.agent import Agent
-from imrl.agent.policy_agent import policy_value_iteration
-from imrl.agent.value_iteration import initial_theta
 
 
 ExperimentDescriptor = namedtuple('ExperimentDescriptor', ('num_value_iterations',           # Number of value iteration passes to run
@@ -34,10 +31,10 @@ def run_step(step_data, environment):
     """Given the current state, choose an action to take and return the new environment state."""
     state = step_data.state
     agent = step_data.agent
-    assert not step_data.state.is_terminal
-    action = agent.descriptor.decide_action(agent, state, environment.num_actions, environment.reward_vector)
-    state_prime = environment.take_action(state, environment.size, action, environment)
-    agent_prime = agent.descriptor.update(agent, action, state, state_prime, 1.0)
+    assert not environment.is_terminal(step_data.state)
+    action = agent.policy.choose_action(state)
+    state_prime = environment.next_state(state, action)
+    agent_prime = agent.update(state, action, state_prime)
     return StepData(state_prime, action, step_data.step_id + 1, agent_prime)
 
 
@@ -66,7 +63,7 @@ def run_episode(episode_id, initial_agent, environment, num_value_iterations, va
     if episode_id == value_iteration_policy_start:
         value_iterated_agent = value_iterated_agent.descriptor.switch_policy(value_iterated_agent, policy_value_iteration)
     for step_data in generate_state(value_iterated_agent, environment):
-        if step_data.state.is_terminal:
+        if environment.is_terminal(step_data.state):
             agent = step_data.agent
             terminal_agent = agent.descriptor.terminal_update(agent, step_data.action, step_data.state)
             results = m(episode_id=episode_id, steps=step_data.step_id)

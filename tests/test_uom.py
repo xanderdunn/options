@@ -4,7 +4,7 @@
 import numpy as np
 
 # First party
-from imrl.agent.uom import update_m, update_u, uom_primitive
+from imrl.agent.option.uom import update_m, update_u, uom_primitive
 from imrl.environment.gridworld import State, Position
 from imrl.agent.fa.func_approx import tabular_function_approximator
 

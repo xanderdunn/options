@@ -33,6 +33,6 @@ def test_taking_actions():
 
 def test_termination():
     """Does the environment terminate in the correct state?"""
-    environment = GridworldContinuous(0.05, 0.01, take_action, 4, initial_state, Position(0.95, 0.95), 0.02)
+    environment = GridworldContinuous(0.05, 0.01, take_action, 4, initial_state, Position(1, 1), 0.05)
     assert not is_terminal(Position(0, 0), environment)
-    assert is_terminal(Position(0.96, 0.94), environment)
+    assert is_terminal(Position(0.97, 0.98), environment)
