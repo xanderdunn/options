@@ -36,7 +36,6 @@ def parse_args(argv):
     parser.add_argument('--vi_interval', help='Execute value iteration after every n episodes', type=int, default=50)
     parser.add_argument('--num_vi', help='Number of iterations of value iteration to perform at each interval vi_interval.', type=int, default=1)
     parser.add_argument('--agent_policy', help='Choose the agent\'s policy.', choices=['random'], default='random')
-    parser.add_argument('--func_approx', help='Choose the agent\'s function approximator.', choices=['tabular', 'rbf'], default='tabular')
     # Environment
     parser.add_argument('--environment', help='Choose the environment.', choices=['gridworld', 'gridworld_continuous'], default='gridworld')
     parser.add_argument('--gridworld_size', help='Gridworld is size * size', type=int, default=3)
@@ -62,8 +61,8 @@ def main(argv):
     environment = (args.environment == 'gridworld' and Gridworld(args.gridworld_size, args.failure_rate)) or \
                   (args.environment == 'gridworld_continuous' and GridworldContinuous(0.2, 0.05))
     policy = (args.agent_policy == 'random' and RandomPolicy(environment.num_actions))
-    fa = (args.func_approx == 'tabular' and TabularFA(environment.size*environment.size)) or \
-        (args.func_approx == 'rbf' and RBF(2, 5))
+    fa = (args.environment == 'gridworld' and TabularFA(environment.size * environment.size)) or \
+        (args.environment == 'gridworld_continuous' and RBF(2, 5))
     samples = []  # list(range(environment.num_states()))
     samples.reverse()
     agent = Agent(policy, fa, environment.num_actions, args.alpha, args.gamma, args.eta, args.epsilon, samples)
