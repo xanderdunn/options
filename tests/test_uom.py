@@ -4,32 +4,26 @@
 import numpy as np
 
 # First party
-from imrl.agent.uom import update_m, update_u, uom_primitive
-from imrl.environment.gridworld import State, Position
-from imrl.agent.fa.func_approx import tabular_function_approximator
+from imrl.agent.option.option import Option
+from imrl.agent.policy.policy_fixed import FixedPolicy
+from imrl.environment.gridworld import GridPosition
+from imrl.agent.fa.tabular import TabularFA
 
 
-def test_m_update():
+def test_uom_update():
     """Is the M matrix updated properly?"""
-    uom = uom_primitive(9, 1.0, 0.999)
-    assert uom.m.shape == (9, 9)
-    state = State(Position(0, 0), False, 0)
-    state_prime = State(Position(1, 0), False, 0)
-    fv = tabular_function_approximator(state, 9)
-    fv_prime = tabular_function_approximator(state_prime, 9)
-    m_prime = update_m(uom, fv, fv_prime, 1.0)
+    option = Option(TabularFA(9), FixedPolicy(4, 2), 0.1, 0.99)
+    assert option.uom.m.shape == (9, 9)
+    assert option.uom.u.shape == (9, 9)
+    state = 0
+    state_prime = 1
+    fv = option.fa.evaluate(state)
+    fv_prime = option.fa.evaluate(state_prime)
+    m_prime = option.uom.update_m(fv, fv_prime, 1.0)
     zeros_matrix = np.zeros((9, 9))
-    zeros_matrix[1, 0] = uom.descriptor.gamma
+    zeros_matrix[1, 0] = option.uom.gamma * option.uom.eta
     assert np.array_equal(zeros_matrix, m_prime)
-
-
-def test_u_update():
-    """Is the U matrix updated properly?"""
-    uom = uom_primitive(9, 1.0, 0.999)
-    assert uom.u.shape == (9, 9)
-    state = State(Position(0, 0), False, 0)
-    fv = tabular_function_approximator(state, 9)
-    u_prime = update_u(uom, fv)
+    u_prime = option.uom.update_u(fv)
     zeros_matrix = np.zeros((9, 9))
-    zeros_matrix[0, 0] = 1
+    zeros_matrix[0, 0] = option.uom.eta
     assert np.array_equal(zeros_matrix, u_prime)

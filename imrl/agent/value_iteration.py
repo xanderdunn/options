@@ -6,28 +6,43 @@ import random
 # Third party
 import numpy as np
 
+class ValueIteration:
 
-def initial_theta(fv_size):
-    """Sparse matrix that theta is initialized to."""
-    return np.zeros((fv_size, 1))
+    def __init__(self, reward_state, agent, alpha=0.1, gamma=0.99):
+        self.agent = agent
+        self.r = agent.fa.evaluate(reward_state)
+        self.alpha = alpha
+        self.gamma = gamma
+        self.theta = np.zeros((agent.fa.num_features, 1))
 
+    def run(self, iterations):
+        """Run value iteration for the given number of iterations starting from a zero-initialized value function"""
+        theta = np.zeros((self.agent.fa.num_features, 1))
+        for i in range(iterations):
+            theta = self.sweep(theta)
+        self.theta = theta
+        return theta
 
-def update_theta(theta, alpha, f, uoms, fvs):
-    """Given the previous value iteration theta, learning rate alpha, reward function f, universal option model matrices u and m, feature vector sample set fv, and discount factor gamma, return the updated value iteration theta_prime."""
-    # TODO: What is an elegant way to remove this mutable state?
-    theta_prime = theta
-    for fv in reversed(fvs):
-        theta_prime = update_theta_single(theta_prime, alpha, f, uoms, fv)
-    return theta_prime
+    def sweep(self, theta):
+        """Adjust the current value function estimate theta by performing a full backup."""
+        for s in self.agent.samples:
+            theta = self.backup(theta, s)
+        return theta
 
+    def backup(self, theta, s):
+        """Get the maximum Bellman residual over all options."""
+        fv = self.agent.fa.evaluate(s)
+        max_value = max([self.get_residual(theta, o, fv) for o in self.agent.options.values()])
+        delta = (self.alpha * (max_value - np.dot(fv.T, theta))) * fv
+        return theta + delta
 
-def scalar(theta, f, uom, fv):
-    """Calculate the scalar matrix product that is used in both the theta and policy calculations."""
-    return np.dot(f.T, np.dot(uom.u, fv)) + uom.descriptor.gamma * np.dot(np.dot(uom.m, fv).T, theta)
+    def get_residual(self, theta, o, fv):
+        """Calculate the scalar matrix product that is used in both the theta and policy calculations."""
+        return np.dot(self.r.T, np.dot(o.uom.u, fv)) + self.gamma * np.dot(np.dot(o.uom.m, fv).T, theta)
 
-
-def update_theta_single(theta, alpha, f, uoms, fv):
-    """This is called by update_theta for a single feature vector fv."""
-    max_value = max([scalar(theta, f, uom, fv) for uom in uoms])
-    update_value = (alpha * (max_value - np.dot(fv.T, theta))) * fv
-    return theta + update_value
+    def get_max_action(self, s):
+        fv = self.agent.fa.evaluate(s)
+        values = [self.get_residual(self.theta, o, fv) for o in self.agent.options.values()]
+        max_value = max(values)
+        max_value_actions = [i for i, x in enumerate(values) if x == max_value]
+        return random.choice(max_value_actions)
