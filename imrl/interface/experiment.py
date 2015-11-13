@@ -19,8 +19,7 @@ from imrl.environment.gridworld import GridPosition
 
 ExperimentDescriptor = namedtuple('ExperimentDescriptor', ('num_value_iterations',           # Number of value iteration passes to run
                                                            'value_iterations_interval',      # Do value iteration updates every n intervals
-                                                           'num_episodes',                   # Number of episodes to execute
-                                                           'value_iteration_policy_start'))  # Starting at this episode, the agent will be execute value iteration policy
+                                                           'num_episodes'))                  # Number of episodes to execute
 EpisodeData = namedtuple('EpisodeData', ('agent', 'results', 'episode_id'))
 StepData = namedtuple('StepData', ('state',    # The environment's current state
                                    'action',   # The action the agent took that got the environment into this state
@@ -53,11 +52,11 @@ def run_value_iteration(episode_id, agent, environment, num_value_iterations, va
         return VIPolicy(environment.num_actions, vi)
 
 
-def run_episode(episode_id, initial_agent, environment, num_value_iterations, value_iterations_interval, value_iteration_policy_start):
+def run_episode(episode_id, initial_agent, environment, num_value_iterations, value_iterations_interval):
     """Run through a single episode to termination.  Returns the results for that episode."""
     logging.info('Starting episode {}'.format(episode_id))
     vi_policy = run_value_iteration(episode_id, initial_agent, environment, num_value_iterations, value_iterations_interval)
-    if episode_id == value_iteration_policy_start:
+    if vi_policy is not None:
         initial_agent.policy = vi_policy
     for step_data in generate_state(initial_agent, environment):
         if environment.is_terminal(step_data.state):
@@ -71,8 +70,7 @@ def episode_results_generator(agent, environment, experiment_description):
     """Execute episodes and yield the results for each episode."""
     return iterate_results(lambda episode_data: run_episode(episode_data.episode_id + 1, episode_data.agent,
                                                             environment, experiment_description.num_value_iterations,
-                                                            experiment_description.value_iterations_interval,
-                                                            experiment_description.value_iteration_policy_start), EpisodeData(agent, None, 0))
+                                                            experiment_description.value_iterations_interval), EpisodeData(agent, None, 0))
 
 
 # Think about using tee and chain, or izip to generate the step_id along with the episode_id

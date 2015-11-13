@@ -35,7 +35,6 @@ def parse_args(argv):
     parser.add_argument('--epsilon', help='New state sample distance threshold', type=float, default=0.1)
     parser.add_argument('--vi_interval', help='Execute value iteration after every n episodes', type=int, default=50)
     parser.add_argument('--num_vi', help='Number of iterations of value iteration to perform at each interval vi_interval.', type=int, default=1)
-    parser.add_argument('--vi_ex_start', help='Begin to execute the value iteration policy after n episodes.', type=int, default=100)
     parser.add_argument('--agent_policy', help='Choose the agent\'s policy.', choices=['random'], default='random')
     parser.add_argument('--func_approx', help='Choose the agent\'s function approximator.', choices=['tabular', 'rbf'], default='tabular')
     # Environment
@@ -65,11 +64,11 @@ def main(argv):
     policy = (args.agent_policy == 'random' and RandomPolicy(environment.num_actions))
     fa = (args.func_approx == 'tabular' and TabularFA(environment.size*environment.size)) or \
         (args.func_approx == 'rbf' and RBF(2, 5))
-    samples = []#list(range(environment.num_states()))
+    samples = []  # list(range(environment.num_states()))
     samples.reverse()
     agent = Agent(policy, fa, environment.num_actions, args.alpha, args.gamma, args.eta, args.epsilon, samples)
     results_descriptor = ResultsDescriptor(args.results_interval, args.results_path, ['episode_id', 'steps'])
-    experiment_descriptor = ExperimentDescriptor(args.num_vi, args.vi_interval, args.episodes, args.vi_ex_start)
+    experiment_descriptor = ExperimentDescriptor(args.num_vi, args.vi_interval, args.episodes)
     start(experiment_descriptor, agent, environment, results_descriptor)
 
 
