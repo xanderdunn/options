@@ -7,11 +7,13 @@ import numpy as np
 from imrl.agent.option.option import Option
 from imrl.agent.policy.policy_fixed import FixedPolicy
 from imrl.agent.agent_viz import AgentViz
+from imrl.agent.agent_viz_disc import AgentVizDisc
+from imrl.environment.gridworld import Action
 
 
 class Agent:
 
-    def __init__(self, policy, fa, num_actions, alpha, gamma, eta, epsilon, samples=[], subgoals=[], viz=False):
+    def __init__(self, policy, fa, num_actions, alpha, gamma, eta, epsilon, samples=[], subgoals=[]):
         self.policy = policy
         self.fa = fa
         self.options = {i: Option(fa, FixedPolicy(num_actions, i), eta, gamma) for i in range(num_actions)}
@@ -20,7 +22,10 @@ class Agent:
         self.epsilon = epsilon
         self.samples = samples
         self.subgoals = subgoals
-        self.viz = AgentViz(self) if viz else None
+        self.viz = None
+
+    def create_visualization(self, discrete=False, gridworld=None):
+        self.viz = AgentVizDisc(self, gridworld) if discrete else AgentViz(self)
 
     def terminal_update(self, state, action):
         """Called to do any update of the termination state."""

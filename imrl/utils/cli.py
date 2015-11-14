@@ -65,6 +65,8 @@ def main(argv):
         (args.environment == 'gridworld_continuous' and RBF(2, 5))
     samples = []
     agent = Agent(policy, fa, environment.num_actions, args.alpha, args.gamma, args.eta, args.epsilon, samples)
+    if args.agent_viz:
+        agent.create_visualization(args.environment == 'gridworld' or args.environment == 'combo_lock', environment)
     results_descriptor = ResultsDescriptor(args.results_interval, args.results_path, ['episode_id', 'steps'])
     experiment_descriptor = ExperimentDescriptor(args.num_vi, args.vi_interval, args.episodes)
     start(experiment_descriptor, agent, environment, results_descriptor)

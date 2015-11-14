@@ -14,7 +14,6 @@ from imrl.utils.results_writer import write_results, merge_results, initialize_r
 from imrl.utils.iterators import iterate_results
 from imrl.agent.policy.policy_vi import VIPolicy
 from imrl.agent.value_iteration import ValueIteration
-from imrl.environment.gridworld import GridPosition
 
 
 ExperimentDescriptor = namedtuple('ExperimentDescriptor', ('num_value_iterations',           # Number of value iteration passes to run
@@ -57,7 +56,11 @@ def run_episode(episode_id, initial_agent, environment, num_value_iterations, va
     logging.info('Starting episode {}'.format(episode_id))
     vi_policy = run_value_iteration(episode_id, initial_agent, environment, num_value_iterations, value_iterations_interval)
     if vi_policy is not None:
+        rand_policy = initial_agent.policy
         initial_agent.policy = vi_policy
+        if initial_agent.viz:
+            initial_agent.viz.update()
+        # initial_agent.policy = rand_policy
     for step_data in generate_state(initial_agent, environment):
         if environment.is_terminal(step_data.state):
             agent = step_data.agent
