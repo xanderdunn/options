@@ -39,8 +39,8 @@ class GridworldContinuous(Environment):
         mapped_action = Action(action)
         noise = np.random.normal(0, self.move_sd)
         move = np.random.normal(self.move_mean, self.move_sd)
-        tentative_pos = (mapped_action == Action.up and GridPosition(state[0] + noise, state[0] + move)) or \
-                        (mapped_action == Action.down and GridPosition(state[0] + noise, state[0] - move)) or \
-                        (mapped_action == Action.left and GridPosition(state[0] + move, state[0] + noise)) or \
-                        (mapped_action == Action.right and GridPosition(state[0] - move, state[0] + noise))
+        tentative_pos = (mapped_action == Action.up and GridPosition(state[0] + noise, state[1] + move)) or \
+                        (mapped_action == Action.down and GridPosition(state[0] + noise, state[1] - move)) or \
+                        (mapped_action == Action.left and GridPosition(state[0] + move, state[1] + noise)) or \
+                        (mapped_action == Action.right and GridPosition(state[0] - move, state[1] + noise))
         return np.asarray([min(1, max(tentative_pos.x, 0)), min(1, max(tentative_pos.y, 0))])

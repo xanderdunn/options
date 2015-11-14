@@ -59,12 +59,11 @@ def main(argv):
     random.seed(args.seed)
     logging.basicConfig(level=log_level(args.log_level))
     environment = (args.environment == 'gridworld' and Gridworld(args.gridworld_size, args.failure_rate)) or \
-                  (args.environment == 'gridworld_continuous' and GridworldContinuous(0.2, 0.05))
+                  (args.environment == 'gridworld_continuous' and GridworldContinuous(0.2, 0.03))
     policy = (args.agent_policy == 'random' and RandomPolicy(environment.num_actions))
     fa = (args.environment == 'gridworld' and TabularFA(environment.size * environment.size)) or \
         (args.environment == 'gridworld_continuous' and RBF(2, 5))
-    samples = []  # list(range(environment.num_states()))
-    samples.reverse()
+    samples = []
     agent = Agent(policy, fa, environment.num_actions, args.alpha, args.gamma, args.eta, args.epsilon, samples)
     results_descriptor = ResultsDescriptor(args.results_interval, args.results_path, ['episode_id', 'steps'])
     experiment_descriptor = ExperimentDescriptor(args.num_vi, args.vi_interval, args.episodes)

@@ -6,10 +6,12 @@ import numpy as np
 # First party
 from imrl.agent.option.option import Option
 from imrl.agent.policy.policy_fixed import FixedPolicy
+from imrl.agent.agent_viz import AgentViz
+
 
 class Agent:
 
-    def __init__(self, policy, fa, num_actions, alpha, gamma, eta, epsilon, samples=[], subgoals=[]):
+    def __init__(self, policy, fa, num_actions, alpha, gamma, eta, epsilon, samples=[], subgoals=[], viz=False):
         self.policy = policy
         self.fa = fa
         self.options = {i: Option(fa, FixedPolicy(num_actions, i), eta, gamma) for i in range(num_actions)}
@@ -18,6 +20,7 @@ class Agent:
         self.epsilon = epsilon
         self.samples = samples
         self.subgoals = subgoals
+        self.viz = AgentViz(self) if viz else None
 
     def terminal_update(self, state, action):
         """Called to do any update of the termination state."""
@@ -26,6 +29,8 @@ class Agent:
         uom.update_u(fv)
         self.evaluate_sample(state)
         # self.evaluate_subgoal(state)
+        if self.viz:
+            self.viz.update()
 
     def update(self, state, action, state_prime):
         """Update an agent with options and return the new agent."""
@@ -39,7 +44,7 @@ class Agent:
         # self.evaluate_subgoal(state)
 
     def evaluate_sample(self, state):
-        """Check whether the given state should be added to the state sample set based on distance citerion (epsilon)."""
+        """Check whether the given state should be added to the state sample set based on distance criterion (epsilon)."""
         if isinstance(state, int):  # Just check set membership for discrete domains.
             if state not in self.samples:
                 self.samples.append(state)

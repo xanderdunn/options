@@ -35,7 +35,7 @@ def test_discrete_gridworld_experiment():
     num_episodes = 100
     environment = Gridworld(gridworld_size, 0.0)
     fa = TabularFA(environment.num_states())
-    experiment_description = ExperimentDescriptor(5, 5, num_episodes, None)
+    experiment_description = ExperimentDescriptor(5, 5, num_episodes)
     agent = Agent(RandomPolicy(environment.num_actions), TabularFA(environment.num_states()), environment.num_actions, 0.1, 0.99, 0.1, 0.05)
     vi_policy = VIPolicy(environment.num_actions, ValueIteration(environment.reward_vector(), agent))
     results_path = os.path.join(os.getcwd(), 'results.txt')

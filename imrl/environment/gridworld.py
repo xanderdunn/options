@@ -2,14 +2,14 @@
 
 # System
 from collections import namedtuple
-from enum import Enum
+from enum import IntEnum
 import random
 # First party
 from imrl.utils.linear_algebra import one_hot_vector
 from imrl.environment.environment import Environment
 
 
-class Action(Enum):
+class Action(IntEnum):
     """Possible actions that can be taken in the gridworld."""
     up = 0
     down = 1
