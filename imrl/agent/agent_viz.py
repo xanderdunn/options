@@ -14,12 +14,6 @@ class AgentViz:
         self.agent = agent
         fig, ((self.samples, self.policy), (self.vf, self.reward)) = plt.subplots(2, 2, figsize=(10, 10))
 
-        # Samples plot
-        self.samples.set_title('Samples')
-
-        # Policy plot
-        self.policy.set_title('Policy')
-
         # Value function plot
         self.vf.set_title('Value Function')
         div = make_axes_locatable(self.vf)
@@ -31,7 +25,7 @@ class AgentViz:
         self.reward_div = div.append_axes("right", size="5%", pad=0.1)
 
         self.make_grid_samples()
-
+        self.set_titles()
         plt.ion()
         plt.show()
 
@@ -41,6 +35,12 @@ class AgentViz:
         self.grid_samples = np.asarray([np.asarray(a) for a in segmentation])
         self.state_samples = self.grid_samples
 
+    def set_titles(self):
+        self.samples.set_title('Samples')
+        self.policy.set_title('Policy')
+        self.vf.set_title('Value Function')
+        self.reward.set_title('Reward Function')
+
     def update(self):
         self.plot_samples()
         if isinstance(self.agent.policy, VIPolicy):
@@ -48,6 +48,7 @@ class AgentViz:
             self.plot_reward()
             self.plot_policy()
         self.update_plot_limits()
+        self.set_titles()
         plt.draw()
         plt.pause(0.00001)
 

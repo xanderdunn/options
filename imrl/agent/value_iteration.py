@@ -17,7 +17,7 @@ class ValueIteration:
 
     def run(self, iterations):
         """Run value iteration for the given number of iterations starting from a zero-initialized value function"""
-        theta = np.zeros((self.agent.fa.num_features, 1))
+        theta = self.theta  # np.zeros((self.agent.fa.num_features, 1))
         for i in range(iterations):
             theta = self.sweep(theta)
         self.theta = theta

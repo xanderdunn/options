@@ -8,7 +8,6 @@ from imrl.agent.option.option import Option
 from imrl.agent.policy.policy_fixed import FixedPolicy
 from imrl.agent.agent_viz import AgentViz
 from imrl.agent.agent_viz_disc import AgentVizDisc
-from imrl.environment.gridworld import Action
 
 
 class Agent:
@@ -27,13 +26,9 @@ class Agent:
     def create_visualization(self, discrete=False, gridworld=None):
         self.viz = AgentVizDisc(self, gridworld) if discrete else AgentViz(self)
 
-    def terminal_update(self, state, action):
+    def terminal_update(self, state, action, state_prime):
         """Called to do any update of the termination state."""
-        fv = self.fa.evaluate(state)
-        uom = self.options[action].uom
-        uom.update_u(fv)
-        self.evaluate_sample(state)
-        # self.evaluate_subgoal(state)
+        self.update(state, action, state_prime)
         if self.viz:
             self.viz.update()
 
@@ -67,4 +62,3 @@ class Agent:
     def evaluate_subgoal(self, state):
         """Check whether the given state is a subgoal for an as yet uncreated option and create one if so."""
         raise NotImplementedError("Should create a new option for the given state if it is a subgoal.")
-

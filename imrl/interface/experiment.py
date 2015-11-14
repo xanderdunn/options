@@ -64,7 +64,7 @@ def run_episode(episode_id, initial_agent, environment, num_value_iterations, va
     for step_data in generate_state(initial_agent, environment):
         if environment.is_terminal(step_data.state):
             agent = step_data.agent
-            agent.terminal_update(step_data.state, step_data.action)
+            agent.terminal_update(step_data.state, step_data.action, step_data.state)
             results = m(episode_id=episode_id, steps=step_data.step_id)
             return EpisodeData(agent, results, episode_id)
 

@@ -12,12 +12,12 @@ class RBF(FunctionApproximator):
     """Radial basis function approximator. Creates n^d RBF kernels evenly spaced,
     d is the dimensionality of the input space and n is the number of kernels along a single dimension (the resolution)"""
 
-    def __init__(self, dim, resolution, min_val=0, max_val=1, eps=8):
+    def __init__(self, dim, resolution, beta=40, min_val=0, max_val=1):
         super(RBF, self).__init__(resolution ** dim)
         self.dim = dim
         self.min_val = min_val
         self.max_val = max_val
-        self.eps = eps
+        self.beta = beta
 
         # Segment the space based on resolution
         segmentation = [np.linspace(min_val, max_val, resolution).tolist()] * dim
@@ -28,7 +28,7 @@ class RBF(FunctionApproximator):
 
     def _evalulate_kernel(self, c, x):
         """Evaluate an RBF kernel c at a given point x."""
-        return np.exp(-self.eps * norm(c - x) ** 2)
+        return np.exp(-self.beta * norm(c - x, 2) ** 2)
 
     def evaluate(self, s):
         """Get the feature vector for a given state s."""
