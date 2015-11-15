@@ -17,3 +17,6 @@ class Environment:
 
     def is_terminal(self, state):
         raise NotImplementedError("Should return true if given state is terminal.")
+
+    def create_subgoals(self):
+        raise NotImplementedError("Should return a set of subgoal states/regions.")

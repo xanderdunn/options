@@ -7,6 +7,7 @@ import random
 # First party
 from imrl.utils.linear_algebra import one_hot_vector
 from imrl.environment.environment import Environment
+from imrl.agent.option.option import Subgoal
 
 
 class Action(IntEnum):
@@ -41,6 +42,11 @@ class Gridworld(Environment):
     def state_from_grid_position(self, position):
         """Returns a state index from a grid position."""
         return int(position.x + self.size * position.y)
+
+    def create_subgoals(self):
+        return [Subgoal(self.state_from_grid_position(GridPosition(self.size//2, self.size//2))),
+                Subgoal(self.state_from_grid_position(GridPosition(self.size-1, 0))),
+                Subgoal(self.state_from_grid_position(GridPosition(0, self.size-1)))]
 
     def reward_vector(self):
         return self.num_states() - 1

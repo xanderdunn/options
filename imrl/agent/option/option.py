@@ -8,12 +8,25 @@ import numpy as np
 from imrl.agent.option.uom import UOM
 
 
+class Subgoal:
+
+    def __init__(self, state, radius=0):
+        self.state = state
+        self.radius = radius
+
+    def __eq__(self, other):
+        if isinstance(self.state, int):
+            return self.state == other.state
+        else:
+            return (self.state == other.state).all() and self.radius == other.radius
+
 class Option:
 
-    def __init__(self, fa, policy, alpha, gamma):
+    def __init__(self, fa, policy, alpha, gamma, subgoal):
         self.fa = fa
         self.policy = policy
         self.uom = UOM(fa, alpha, gamma)
+        self.subgoal = subgoal
 
     def get_next_fv(self, fv):
         """Get expected next feature vector given feature vector fv."""

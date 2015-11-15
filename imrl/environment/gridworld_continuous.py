@@ -4,6 +4,7 @@
 import numpy as np
 
 # First party
+from imrl.agent.option.option import Subgoal
 from imrl.environment.gridworld import GridPosition, Action
 from imrl.environment.environment import Environment
 
@@ -16,6 +17,9 @@ class GridworldContinuous(Environment):
         self.move_sd = move_sd
         self.reward_center = reward_center
         self.reward_radius = reward_radius
+
+    def create_subgoals(self):
+        return [Subgoal(np.asarray([0.5, 0.5]), 0.05), Subgoal(np.asarray([1, 0]), 0.05), Subgoal(np.asarray([0, 1]), 0.05)]
 
     def reward_vector(self):
         return self.reward_center

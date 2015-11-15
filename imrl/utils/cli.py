@@ -65,8 +65,7 @@ def main(argv):
     policy = (args.agent_policy == 'random' and RandomPolicy(environment.num_actions))
     fa = (args.environment == 'gridworld' and TabularFA(environment.size * environment.size)) or \
         (args.environment == 'gridworld_continuous' and RBF(2, 7, beta=args.beta))
-    samples = []
-    agent = Agent(policy, fa, environment.num_actions, args.alpha, args.gamma, args.eta, args.epsilon, samples)
+    agent = Agent(policy, fa, environment.num_actions, args.alpha, args.gamma, args.eta, args.epsilon, subgoals=environment.create_subgoals())
     if args.agent_viz:
         agent.create_visualization(args.environment == 'gridworld' or args.environment == 'combo_lock', environment)
     results_descriptor = ResultsDescriptor(args.results_interval, args.results_path, ['episode_id', 'steps'])
