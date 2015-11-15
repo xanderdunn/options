@@ -23,9 +23,7 @@ from imrl.interface.experiment import start, ExperimentDescriptor
 from imrl.environment.gridworld import Gridworld
 from imrl.agent.agent import Agent
 from imrl.agent.fa.tabular import TabularFA
-from imrl.agent.policy.policy_vi import VIPolicy
 from imrl.agent.policy.policy_random import RandomPolicy
-from imrl.agent.value_iteration import ValueIteration
 from imrl.utils.results_writer import ResultsDescriptor
 
 
@@ -34,10 +32,9 @@ def test_discrete_gridworld_experiment():
     gridworld_size = 3
     num_episodes = 100
     environment = Gridworld(gridworld_size, 0.0)
-    fa = TabularFA(environment.num_states())
-    experiment_description = ExperimentDescriptor(5, 5, num_episodes, None)
-    agent = Agent(RandomPolicy(environment.num_actions), TabularFA(environment.num_states()), environment.num_actions, 0.1, 0.99, 0.1, 0.05)
-    vi_policy = VIPolicy(environment.num_actions, ValueIteration(environment.reward_vector(), agent))
+    experiment_description = ExperimentDescriptor(5, 5, num_episodes)
+    agent = Agent(RandomPolicy(environment.num_actions), TabularFA(environment.num_states()),
+                  environment.reward_vector(), environment.num_actions, 0.1, 0.99, 0.1, 0.05, 10)
     results_path = os.path.join(os.getcwd(), 'results.txt')
     results_descriptor = ResultsDescriptor(100, results_path, ['episode_id', 'steps'])
     start(experiment_description, agent, environment, results_descriptor)

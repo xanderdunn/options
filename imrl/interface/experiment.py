@@ -12,15 +12,11 @@ from pyrsistent import m
 # First party
 from imrl.utils.results_writer import write_results, merge_results, initialize_results
 from imrl.utils.iterators import iterate_results
-from imrl.agent.policy.policy_vi import VIPolicy
-from imrl.agent.value_iteration import ValueIteration
-from imrl.environment.gridworld import GridPosition
 
 
-ExperimentDescriptor = namedtuple('ExperimentDescriptor', ('num_value_iterations',           # Number of value iteration passes to run
-                                                           'value_iterations_interval',      # Do value iteration updates every n intervals
-                                                           'num_episodes'))                  # Number of episodes to execute
-EpisodeData = namedtuple('EpisodeData', ('agent', 'results', 'episode_id'))
+ExperimentDescriptor = namedtuple('ExperimentDescriptor', ('plan_interval',      # Do value iteration updates every n steps
+                                                           'num_steps'))         # Total number of steps to execute
+IntervalData = namedtuple('IntervalData', ('agent', 'results', 'interval_id'))
 StepData = namedtuple('StepData', ('state',    # The environment's current state
                                    'action',   # The action the agent took that got the environment into this state
                                    'step_id',  # The time step of this state
@@ -31,54 +27,47 @@ def run_step(step_data, environment):
     """Given the current state, choose an action to take and return the new environment state."""
     state = step_data.state
     agent = step_data.agent
-    assert not environment.is_terminal(step_data.state)
     action = agent.policy.choose_action(state)
-    state_prime = environment.next_state(state, action)
+    if environment.is_terminal(step_data.state):
+        state_prime = environment.initial_state()
+    else:
+        state_prime = environment.next_state(state, action)
     agent.update(state, action, state_prime)
     return StepData(state_prime, action, step_data.step_id + 1, agent)
 
 
 def generate_state(agent, environment):
-    """Run a single episode to termination."""
+    """Run a single planning interval for the given number of steps."""
     initial_step_data = StepData(environment.initial_state(), None, 0, agent)  # Initial state with step_id 0
     return iterate(lambda step_data: run_step(step_data, environment), initial_step_data)
 
 
-def run_value_iteration(episode_id, agent, environment, num_value_iterations, value_iterations_interval):
-    """Execute value iteration and return an updated Agent with the computed_policy."""
-    if episode_id % value_iterations_interval == 0:
-        vi = ValueIteration(environment.reward_vector(), agent)
-        vi.run(num_value_iterations)
-        return VIPolicy(environment.num_actions, vi)
-
-
-def run_episode(episode_id, initial_agent, environment, num_value_iterations, value_iterations_interval):
-    """Run through a single episode to termination.  Returns the results for that episode."""
-    logging.info('Starting episode {}'.format(episode_id))
-    vi_policy = run_value_iteration(episode_id, initial_agent, environment, num_value_iterations, value_iterations_interval)
-    if vi_policy is not None:
-        initial_agent.policy = vi_policy
+def run_interval(interval_id, initial_agent, environment, interval_steps):
+    """Run through a single planning interval.  Returns the results for that interval."""
+    logging.info('Starting interval {}'.format(interval_id))
     for step_data in generate_state(initial_agent, environment):
-        if environment.is_terminal(step_data.state):
+        if step_data.step_id == interval_steps:
+            print('Planning...')
+            initial_agent.plan()
+            if initial_agent.viz:
+                initial_agent.viz.update()
             agent = step_data.agent
-            agent.terminal_update(step_data.state, step_data.action)
-            results = m(episode_id=episode_id, steps=step_data.step_id)
-            return EpisodeData(agent, results, episode_id)
+            results = m(interval_id=interval_id, steps=step_data.step_id)
+            return IntervalData(agent, results, interval_id)
 
 
-def episode_results_generator(agent, environment, experiment_description):
-    """Execute episodes and yield the results for each episode."""
-    return iterate_results(lambda episode_data: run_episode(episode_data.episode_id + 1, episode_data.agent,
-                                                            environment, experiment_description.num_value_iterations,
-                                                            experiment_description.value_iterations_interval), EpisodeData(agent, None, 0))
+def interval_results_generator(agent, environment, experiment_description):
+    """Execute planning intervals and yield the results for each interval."""
+    return iterate_results(lambda interval_data: run_interval(interval_data.interval_id + 1, interval_data.agent, environment,
+                                                             experiment_description.plan_interval), IntervalData(agent, None, 0))
 
 
-# Think about using tee and chain, or izip to generate the step_id along with the episode_id
+# Think about using tee and chain, or izip to generate the step_id along with the interval_id
 def start(experiment_description, agent, environment, results_descriptor):
     """Kick off the execution of an experiment."""
     initialize_results(results_descriptor)
-    episode_results = islice(episode_results_generator(agent, environment, experiment_description), experiment_description.num_episodes)
-    results_episode_chunks = chunked(episode_results, results_descriptor.interval)
-    for chunk in results_episode_chunks:
-        results = [episode_data.results for episode_data in chunk]
+    interval_results = islice(interval_results_generator(agent, environment, experiment_description), experiment_description.num_steps)
+    results_interval_chunks = chunked(interval_results, results_descriptor.interval)
+    for chunk in results_interval_chunks:
+        results = [interval_data.results for interval_data in chunk]
         write_results(merge_results(results), results_descriptor)

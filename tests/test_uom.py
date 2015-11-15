@@ -6,13 +6,12 @@ import numpy as np
 # First party
 from imrl.agent.option.option import Option
 from imrl.agent.policy.policy_fixed import FixedPolicy
-from imrl.environment.gridworld import GridPosition
 from imrl.agent.fa.tabular import TabularFA
 
 
 def test_uom_update():
     """Is the M matrix updated properly?"""
-    option = Option(TabularFA(9), FixedPolicy(4, 2), 0.1, 0.99)
+    option = Option(TabularFA(9), FixedPolicy(4, 2), 0.1, 0.99, 0)
     assert option.uom.m.shape == (9, 9)
     assert option.uom.u.shape == (9, 9)
     state = 0
