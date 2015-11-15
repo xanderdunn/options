@@ -69,7 +69,7 @@ def main(argv):
                   args.epsilon, args.num_vi, subgoals=environment.create_subgoals())
     if args.agent_viz:
         agent.create_visualization(args.environment == 'gridworld' or args.environment == 'combo_lock', environment)
-    results_descriptor = ResultsDescriptor(args.results_interval, args.results_path, ['episode_id', 'steps'])
+    results_descriptor = ResultsDescriptor(args.results_interval, args.results_path, ['interval_id', 'steps'])
     experiment_descriptor = ExperimentDescriptor(args.plan_interval, args.num_steps)
     start(experiment_descriptor, agent, environment, results_descriptor)
 
