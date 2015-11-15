@@ -8,7 +8,8 @@ import numpy as np
 
 class ValueIteration:
 
-    def __init__(self, reward_state, agent, iterations, alpha=0.1, gamma=0.99):
+    def __init__(self, id, reward_state, agent, iterations, alpha=0.1, gamma=0.99):
+        self.id = id
         self.agent = agent
         self.r = agent.fa.evaluate(reward_state)
         self.iterations = iterations
@@ -46,10 +47,14 @@ class ValueIteration:
 
     def get_max_action(self, s):
         fv = self.agent.fa.evaluate(s)
-        # values = [self.get_residual(self.theta, o, fv) for o in self.agent.options.values()]
-
-        # For now only allow primitive actions in option policies
-        values = [self.get_residual(self.theta, self.agent.options[i], fv) for i in range(self.agent.num_actions)]
+        values = [self.get_residual(self.theta, o, fv) for o in self.agent.options.values() if o.id != self.id]
         max_value = max(values)
         max_value_actions = [i for i, x in enumerate(values) if x == max_value]
+
+        # If max value actions include both options and primitives, only select from the primitives.
+        primitives = [i for i in max_value_actions if i < self.agent.num_actions]
+        if len(primitives) > 0:
+            max_value_actions = primitives
+        # else:
+        #     print('Option chosen: ' + str(values))
         return random.choice(max_value_actions)

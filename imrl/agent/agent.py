@@ -21,7 +21,7 @@ class Agent:
         self.intrinsic_reward = irf
         self.plan_iterations = plan_iter
         self.num_actions = num_actions
-        self.options = {i: Option(fa, FixedPolicy(num_actions, i), eta, gamma, None) for i in range(num_actions)}
+        self.options = {i: Option(i, fa, FixedPolicy(num_actions, i), eta, gamma, None) for i in range(num_actions)}
         self.alpha = alpha
         self.gamma = gamma
         self.eta = eta
@@ -30,7 +30,7 @@ class Agent:
         self.subgoals = subgoals
         self.reached_subgoals = []
         self.viz = None
-        self.vi = ValueIteration(irf, self, plan_iter, alpha, gamma)
+        self.vi = ValueIteration(-1, irf, self, plan_iter, alpha, gamma)
         self.vi_policy = VIPolicy(num_actions, self.vi)
 
     def create_visualization(self, discrete=False, gridworld=None):
@@ -87,9 +87,10 @@ class Agent:
 
     def create_option(self, subgoal):
         """Create a new option for the given subgoal with a pseudo reward function and value iteration policy."""
-        vi = ValueIteration(subgoal.state, self, self.plan_iterations, self.alpha, self.gamma)
+        id = len(self.options)
+        vi = ValueIteration(id, subgoal.state, self, self.plan_iterations, self.alpha, self.gamma)
         policy = VIPolicy(self.num_actions, vi)
-        self.options[len(self.options)] = Option(self.fa, policy, self.alpha, self.gamma, subgoal)
+        self.options[id] = Option(id, self.fa, policy, self.alpha, self.gamma, subgoal)
 
     def plan(self):
         for i in range(self.num_actions, len(self.options)):

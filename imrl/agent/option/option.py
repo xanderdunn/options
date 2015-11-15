@@ -22,7 +22,8 @@ class Subgoal:
 
 class Option:
 
-    def __init__(self, fa, policy, alpha, gamma, subgoal):
+    def __init__(self, id, fa, policy, alpha, gamma, subgoal):
+        self.id = id
         self.fa = fa
         self.policy = policy
         self.uom = UOM(fa, alpha, gamma)

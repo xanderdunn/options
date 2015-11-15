@@ -91,7 +91,8 @@ class AgentViz:
             vals.append((a == Action.up and [0, 1]) or
                         (a == Action.down and [0, -1]) or
                         (a == Action.left and [1, 0]) or  # Not sure why positive 1 yields a vector that points left
-                        (a == Action.right and [-1, 0]))
+                        (a == Action.right and [-1, 0]) or
+                        [-1, -1])  # Option chosen
         vals = np.asarray(vals)
         self.subplots['policy'][id].cla()
         self.subplots['policy'][id].quiver(self.grid_samples[:, 0], self.grid_samples[:, 1], vals[:, 0], vals[:, 1],
