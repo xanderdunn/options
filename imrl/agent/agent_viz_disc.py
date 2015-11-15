@@ -8,9 +8,9 @@ from imrl.agent.agent_viz import AgentViz
 
 class AgentVizDisc(AgentViz):
 
-    def __init__(self, agent, gridworld):
+    def __init__(self, agent, num_options, gridworld):
         self.gridworld = gridworld
-        super(AgentVizDisc, self).__init__(agent)
+        super(AgentVizDisc, self).__init__(agent, num_options)
 
     def make_grid_samples(self):
         self.grid_samples = np.zeros((self.gridworld.size ** 2, 2))
@@ -22,8 +22,9 @@ class AgentVizDisc(AgentViz):
             self.state_samples.append(i)
 
     def update_plot_limits(self):
-        self.policy.set_xlim([-1, self.gridworld.size])
-        self.policy.set_ylim([-1, self.gridworld.size])
+        for i in range(self.num_options):
+            self.subplots['policy'][i].set_xlim([-1, self.gridworld.size])
+            self.subplots['policy'][i].set_ylim([-1, self.gridworld.size])
 
     def plot_samples(self):
         self.samples.cla()

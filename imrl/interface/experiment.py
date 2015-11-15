@@ -12,8 +12,6 @@ from pyrsistent import m
 # First party
 from imrl.utils.results_writer import write_results, merge_results, initialize_results
 from imrl.utils.iterators import iterate_results
-from imrl.agent.policy.policy_vi import VIPolicy
-from imrl.agent.value_iteration import ValueIteration
 
 
 ExperimentDescriptor = namedtuple('ExperimentDescriptor', ('num_value_iterations',           # Number of value iteration passes to run
@@ -43,24 +41,14 @@ def generate_state(agent, environment):
     return iterate(lambda step_data: run_step(step_data, environment), initial_step_data)
 
 
-def run_value_iteration(episode_id, agent, environment, num_value_iterations, value_iterations_interval):
-    """Execute value iteration and return an updated Agent with the computed_policy."""
-    if episode_id % value_iterations_interval == 0:
-        vi = ValueIteration(environment.reward_vector(), agent)
-        vi.run(num_value_iterations)
-        return VIPolicy(environment.num_actions, vi)
-
-
 def run_episode(episode_id, initial_agent, environment, num_value_iterations, value_iterations_interval):
     """Run through a single episode to termination.  Returns the results for that episode."""
     logging.info('Starting episode {}'.format(episode_id))
-    vi_policy = run_value_iteration(episode_id, initial_agent, environment, num_value_iterations, value_iterations_interval)
-    if vi_policy is not None:
-        rand_policy = initial_agent.policy
-        initial_agent.policy = vi_policy
+    if episode_id % value_iterations_interval == 0:
+        print('Planning...')
+        initial_agent.plan()
         if initial_agent.viz:
             initial_agent.viz.update()
-        # initial_agent.policy = rand_policy
     for step_data in generate_state(initial_agent, environment):
         if environment.is_terminal(step_data.state):
             agent = step_data.agent

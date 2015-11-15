@@ -15,9 +15,11 @@ from imrl.agent.option.option import Subgoal
 
 class Agent:
 
-    def __init__(self, policy, fa, num_actions, alpha, gamma, eta, epsilon, samples=[], subgoals=[]):
+    def __init__(self, policy, fa, irf, num_actions, alpha, gamma, eta, epsilon, plan_iter, samples=[], subgoals=[]):
         self.policy = policy
         self.fa = fa
+        self.intrinsic_reward = irf
+        self.plan_iterations = plan_iter
         self.num_actions = num_actions
         self.options = {i: Option(fa, FixedPolicy(num_actions, i), eta, gamma, None) for i in range(num_actions)}
         self.alpha = alpha
@@ -28,15 +30,16 @@ class Agent:
         self.subgoals = subgoals
         self.reached_subgoals = []
         self.viz = None
+        self.vi = ValueIteration(irf, self, plan_iter, alpha, gamma)
+        self.vi_policy = VIPolicy(num_actions, self.vi)
 
     def create_visualization(self, discrete=False, gridworld=None):
-        self.viz = AgentVizDisc(self, gridworld) if discrete else AgentViz(self)
+        num_options = min(4, len(self.subgoals))
+        self.viz = AgentVizDisc(self, num_options, gridworld) if discrete else AgentViz(self, num_options)
 
     def terminal_update(self, state, action, state_prime):
         """Called to do any update of the termination state."""
         self.update(state, action, state_prime)
-        if self.viz:
-            self.viz.update()
 
     def update(self, state, action, state_prime):
         """Update an agent with options and return the new agent."""
@@ -72,18 +75,23 @@ class Agent:
             if g in self.subgoals and g not in self.reached_subgoals:
                 self.create_option(g)
                 self.reached_subgoals.append(g)
-                # print('Subgoal reached: ' + str(g.state))
+                print('Subgoal reached: ' + str(g.state))
             return
 
         for g in self.subgoals:
             if np.linalg.norm(np.asarray(g.state - state), 2) <= g.radius and g not in self.reached_subgoals:
                 self.create_option(g)
                 self.reached_subgoals.append(g)
-                # print('Subgoal reached: ' + str(g.state) + ',  ' + str(g.radius))
+                print('Subgoal reached: ' + str(g.state) + ',  ' + str(g.radius))
                 break
 
     def create_option(self, subgoal):
         """Create a new option for the given subgoal with a pseudo reward function and value iteration policy."""
-        vi = ValueIteration(subgoal.state, self, self.alpha, self.gamma)
+        vi = ValueIteration(subgoal.state, self, self.plan_iterations, self.alpha, self.gamma)
         policy = VIPolicy(self.num_actions, vi)
         self.options[len(self.options)] = Option(self.fa, policy, self.alpha, self.gamma, subgoal)
+
+    def plan(self):
+        for i in range(self.num_actions, len(self.options)):
+            self.options[i].policy.vi.run()
+        self.vi.run()
