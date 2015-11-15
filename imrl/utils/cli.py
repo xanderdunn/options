@@ -24,9 +24,9 @@ def parse_args(argv):
     parser = argparse.ArgumentParser()
     # General
     parser.add_argument('--seed', help='Seed with which to initialize random number generator.', type=int)
-    parser.add_argument('--episodes', help='Number of episodes to run the experiment.', type=int, default=200)
+    parser.add_argument('--num_steps', help='Number of steps for which to run the experiment.', type=int, default=100000)
     parser.add_argument('--log_level', help='Set log level.', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default='INFO')
-    parser.add_argument('--results_interval', help='Log results out to terminal and file every n episodes.', type=int, default=100)
+    parser.add_argument('--results_interval', help='Log results out to terminal and file every n intervals.', type=int, default=5)
     parser.add_argument('--results_path', help='File path to save the results to.  Default is results.txt in the current working directory.', default=os.path.join(os.getcwd(), 'results.txt'))
     # Agent
     parser.add_argument('--alpha', help='Value iteration step size.', type=float, default=0.03)
@@ -34,13 +34,13 @@ def parse_args(argv):
     parser.add_argument('--gamma', help='Discount factor.', type=float, default=0.99)
     parser.add_argument('--epsilon', help='New state sample distance threshold', type=float, default=0.1)
     parser.add_argument('--beta', help='RBF kernel width parameter.', type=float, default=80)
-    parser.add_argument('--vi_interval', help='Execute value iteration after every n episodes', type=int, default=10)
-    parser.add_argument('--num_vi', help='Number of iterations of value iteration to perform.', type=int, default=20)
+    parser.add_argument('--plan_interval', help='Execute value iteration after every n steps', type=int, default=1000)
+    parser.add_argument('--num_vi', help='Number of iterations of value iteration to perform.', type=int, default=10)
     parser.add_argument('--agent_policy', help='Choose the agent\'s policy.', choices=['random'], default='random')
     parser.add_argument("--agent_viz", action='store_true', default=True, help="Plot agent statistics during runs?")
     # Environment
     parser.add_argument('--environment', help='Choose the environment.', choices=['gridworld', 'gridworld_continuous'], default='gridworld')
-    parser.add_argument('--gridworld_size', help='Gridworld is size * size', type=int, default=5)
+    parser.add_argument('--gridworld_size', help='Gridworld is size * size', type=int, default=10)
     parser.add_argument('--failure_rate', help='The percent of actions in this environment that fail.', type=float, default=0.0)
     return parser.parse_args(argv)
 
@@ -65,12 +65,12 @@ def main(argv):
     policy = (args.agent_policy == 'random' and RandomPolicy(environment.num_actions))
     fa = (args.environment == 'gridworld' and TabularFA(environment.size * environment.size)) or \
         (args.environment == 'gridworld_continuous' and RBF(2, 7, beta=args.beta))
-    agent = Agent(policy, fa, environment.reward_vector(), environment.num_actions, args.alpha, args.gamma, args.eta, args.epsilon, args.num_vi,
-                  subgoals=environment.create_subgoals())
+    agent = Agent(policy, fa, environment.reward_vector(), environment.num_actions, args.alpha, args.gamma, args.eta,
+                  args.epsilon, args.num_vi, subgoals=environment.create_subgoals())
     if args.agent_viz:
         agent.create_visualization(args.environment == 'gridworld' or args.environment == 'combo_lock', environment)
     results_descriptor = ResultsDescriptor(args.results_interval, args.results_path, ['episode_id', 'steps'])
-    experiment_descriptor = ExperimentDescriptor(args.num_vi, args.vi_interval, args.episodes)
+    experiment_descriptor = ExperimentDescriptor(args.plan_interval, args.num_steps)
     start(experiment_descriptor, agent, environment, results_descriptor)
 
 
