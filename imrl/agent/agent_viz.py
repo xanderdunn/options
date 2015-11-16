@@ -71,7 +71,7 @@ class AgentViz:
         for s in self.state_samples:
             vals.append(np.dot(self.agent.fa.evaluate(s).T, reward))
         self.subplots['reward'][id].cla()
-        sc = self.subplots['reward'][id].scatter(self.grid_samples[:, 0], self.grid_samples[:, 1], s=180, c=vals)
+        sc = self.subplots['reward'][id].scatter(self.grid_samples[:, 0], self.grid_samples[:, 1], s=180, c=vals, cmap='Greens')
         plt.colorbar(sc, cax=self.reward_divs[id])
 
     def plot_vf(self, id):
@@ -80,7 +80,7 @@ class AgentViz:
         for s in self.state_samples:
             vals.append(np.dot(self.agent.fa.evaluate(s).T, theta))
         self.subplots['vf'][id].cla()
-        sc = self.subplots['vf'][id].scatter(self.grid_samples[:, 0], self.grid_samples[:, 1], s=180, c=vals)
+        sc = self.subplots['vf'][id].scatter(self.grid_samples[:, 0], self.grid_samples[:, 1], s=180, c=vals, cmap='Greens')
         plt.colorbar(sc, cax=self.vf_divs[id])
 
     def plot_policy(self, id):

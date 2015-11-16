@@ -8,10 +8,10 @@ import numpy as np
 
 class ValueIteration:
 
-    def __init__(self, id, reward_state, agent, iterations, alpha=0.1, gamma=0.99):
+    def __init__(self, id, reward_function, agent, iterations, alpha=0.1, gamma=0.99):
         self.id = id
         self.agent = agent
-        self.r = agent.fa.evaluate(reward_state)
+        self.r = reward_function
         self.iterations = iterations
         self.alpha = alpha
         self.gamma = gamma
@@ -42,7 +42,7 @@ class ValueIteration:
         return theta + delta
 
     def get_residual(self, theta, o, fv):
-        """Calculate the scalar matrix product that is used in both the theta and policy calculations."""
+        """Calculate the scalar product that is used in both the theta and policy calculations."""
         return np.dot(self.r.T, np.dot(o.uom.u, fv)) + self.gamma * np.dot(np.dot(o.uom.m, fv).T, theta)
 
     def get_max_action(self, s):

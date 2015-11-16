@@ -15,22 +15,24 @@ from imrl.agent.option.option import Subgoal
 
 class Agent:
 
-    def __init__(self, policy, fa, irf, num_actions, alpha, gamma, eta, epsilon, plan_iter, samples=[], subgoals=[]):
+    def __init__(self, policy, fa, num_actions, alpha, gamma, eta, zeta, epsilon, plan_iter, samples=[], subgoals=[]):
         self.policy = policy
         self.fa = fa
-        self.intrinsic_reward = irf
+        self.intrinsic = np.ones((self.fa.num_features, 1))
+        self.extrinsic = None
         self.plan_iterations = plan_iter
         self.num_actions = num_actions
         self.options = {i: Option(i, fa, FixedPolicy(num_actions, i), eta, gamma, None) for i in range(num_actions)}
         self.alpha = alpha
         self.gamma = gamma
         self.eta = eta
+        self.zeta = zeta
         self.epsilon = epsilon
         self.samples = samples
         self.subgoals = subgoals
         self.reached_subgoals = []
         self.viz = None
-        self.vi = ValueIteration(-1, irf, self, plan_iter, alpha, gamma)
+        self.vi = ValueIteration(-1, self.intrinsic, self, plan_iter, alpha, gamma)
         self.vi_policy = VIPolicy(num_actions, self.vi)
 
     def create_visualization(self, discrete=False, gridworld=None):
@@ -51,6 +53,18 @@ class Agent:
         uom.update_u(fv)
         self.evaluate_sample(state)
         self.evaluate_subgoal(state)
+        self.update_intrinsic_reward(fv)
+
+    def update_intrinsic_reward(self, fv):
+        self.intrinsic = self.intrinsic + self.zeta * (0 - np.dot(self.intrinsic.T, fv)) * fv
+        self.explore()
+
+    def explore(self):
+        self.vi.r = self.intrinsic
+
+    def exploit(self, goal):
+        self.extrinsic = self.fa.evaluate(goal)
+        self.vi.r = self.extrinsic
 
     def evaluate_sample(self, state):
         """Check whether the given state should be added to the state sample set based on distance criterion (epsilon)."""
@@ -88,7 +102,7 @@ class Agent:
     def create_option(self, subgoal):
         """Create a new option for the given subgoal with a pseudo reward function and value iteration policy."""
         id = len(self.options)
-        vi = ValueIteration(id, subgoal.state, self, self.plan_iterations, self.alpha, self.gamma)
+        vi = ValueIteration(id, self.fa.evaluate(subgoal.state), self, self.plan_iterations, self.alpha, self.gamma)
         policy = VIPolicy(self.num_actions, vi)
         self.options[id] = Option(id, self.fa, policy, self.alpha, self.gamma, subgoal)
 

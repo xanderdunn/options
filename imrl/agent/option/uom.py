@@ -19,14 +19,14 @@ class UOM:
     def update_m(self, fv, fv_prime, tau):
         """Update M based on the previous feature vector fv and the next feature vector fv_prime."""
         assert fv.shape == fv_prime.shape, 'The feature vectors must be the same shape.'
-        m_prime = self.m + self.eta * np.dot(((self.gamma ** tau) * fv_prime - np.dot(self.m, fv)), fv.T)
+        m_prime = self.m + self.eta * np.dot((self.gamma ** tau) * fv_prime - np.dot(self.m, fv), fv.T)
         assert m_prime.shape == self.m.shape, 'The updated M\' must have the same shape as the previous M.'
         self.m = m_prime
         return m_prime
 
     def update_u(self, fv):
         """Given the current matrix U and the previous feature vector fv, return the updated matrix U."""
-        u_prime = self.u + self.eta * np.dot((fv - np.dot(self.u, fv)), fv.T)
+        u_prime = self.u + self.eta * np.dot(fv - np.dot(self.u, fv), fv.T)
         assert u_prime.shape == self.u.shape, 'The updated U\' must have the same shape as the previous U.'
         self.u = u_prime
         return u_prime
