@@ -7,11 +7,12 @@ import numpy as np
 from imrl.agent.option.option import Option
 from imrl.agent.policy.policy_fixed import FixedPolicy
 from imrl.agent.fa.tabular import TabularFA
+from imrl.agent.option.option import Subgoal
 
 
 def test_uom_update():
     """Is the M matrix updated properly?"""
-    option = Option(TabularFA(9), FixedPolicy(4, 2), 0.1, 0.99, 0)
+    option = Option(0, TabularFA(9), FixedPolicy(4, 2), 0.1, 0.99, None)
     assert option.uom.m.shape == (9, 9)
     assert option.uom.u.shape == (9, 9)
     state = 0
