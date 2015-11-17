@@ -6,6 +6,7 @@ import random
 # First party
 from imrl.environment.combination_lock import CombinationLock
 from imrl.agent.option.option import Subgoal
+from imrl.environment.gridworld import GridPosition
 
 
 def test_taking_correct_actions():
@@ -13,33 +14,31 @@ def test_taking_correct_actions():
     random.seed()
     environment = CombinationLock(3, 1, 6, [1, 5, 4], 0.0)
 
-    assert environment.position_from_state(0) == []
-    assert environment.position_from_state(1) == [1]
-    assert environment.position_from_state(2) == [1, 5]
-    assert environment.position_from_state(3) == [1, 5, 4]
+    assert environment.actions_from_state(0) == []
+    assert environment.actions_from_state(1) == [1]
+    assert environment.actions_from_state(2) == [1, 5]
+    assert environment.actions_from_state(3) == [1, 5, 4]
 
-    assert not environment.is_terminal()
+    assert not environment.is_terminal([])
 
     # Deterministic tests
     state1 = environment.next_state(environment.initial_state(), 1)
     assert state1 == 1
-    assert not environment.is_terminal()
+    assert not environment.is_terminal(environment.actions_from_state(state1))
 
     state2 = environment.next_state(state1, 5)
     assert state2 == 2
-    assert not environment.is_terminal()
+    assert not environment.is_terminal(environment.actions_from_state(state2))
 
     state3 = environment.next_state(state2, 4)
     assert state3 == 3
-    assert environment.is_terminal()
 
-    # Reset and test taking a wrong action
-    environment.reset()
-    assert not environment.is_terminal()
+    assert environment.is_terminal(environment.actions_from_state(state3) + [2])
+    state4 = environment.next_state(state3, 4)
+    assert state4 == 0
+    assert not environment.is_terminal(environment.actions_from_state(state4))
 
-    state1 = environment.next_state(environment.initial_state(), 5)
-    assert state1 == 0
-    assert environment.is_terminal()
+    assert environment.is_terminal([2])
 
 
 def test_subgoals():
@@ -49,3 +48,11 @@ def test_subgoals():
     assert environment.num_states() == 3
 
     assert environment.create_subgoals() == [Subgoal(1), Subgoal(2), Subgoal(3)]
+
+
+def test_grid_position():
+    """Are the grid positions correct?"""
+    environment = CombinationLock(3, 1, 6, [1, 5, 4], 0.0)
+    assert environment.grid_position_from_state(2) == GridPosition(2, 0)
+    assert environment.grid_position_from_state(3) == GridPosition(0, 1)
+
