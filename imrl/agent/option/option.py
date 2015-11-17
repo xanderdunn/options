@@ -20,6 +20,13 @@ class Subgoal:
         else:
             return (self.state == other.state).all() and self.radius == other.radius
 
+    def __repr__(self):
+        return "Subgoal({})".format(self.state)
+
+    def __str__(self):
+        return "{}".format(self.state)
+
+
 class Option:
 
     def __init__(self, id, fa, policy, alpha, gamma, subgoal):

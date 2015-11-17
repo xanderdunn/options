@@ -47,7 +47,7 @@ def run_interval(interval_id, initial_agent, environment, interval_steps):
     logging.info('Starting interval {}'.format(interval_id))
     for step_data in generate_state(initial_agent, environment):
         if step_data.step_id == interval_steps:
-            print('Planning...')
+            logging.info('Planning...')
             initial_agent.plan()
             if initial_agent.viz:
                 initial_agent.viz.update()

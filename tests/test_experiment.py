@@ -30,11 +30,10 @@ from imrl.utils.results_writer import ResultsDescriptor
 def test_discrete_gridworld_experiment():
     """Test the learning on an n*n tabular, discrete gridworld."""
     gridworld_size = 3
-    num_episodes = 100
     environment = Gridworld(gridworld_size, 0.0)
-    experiment_description = ExperimentDescriptor(5, 5, num_episodes)
+    experiment_description = ExperimentDescriptor(5, 100)
     agent = Agent(RandomPolicy(environment.num_actions), TabularFA(environment.num_states()),
                   environment.reward_vector(), environment.num_actions, 0.1, 0.99, 0.1, 0.05, 10)
     results_path = os.path.join(os.getcwd(), 'results.txt')
-    results_descriptor = ResultsDescriptor(100, results_path, ['episode_id', 'steps'])
+    results_descriptor = ResultsDescriptor(100, results_path, ['interval_id', 'steps'])
     start(experiment_description, agent, environment, results_descriptor)
