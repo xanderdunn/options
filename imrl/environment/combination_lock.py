@@ -7,6 +7,7 @@ from itertools import islice
 # First party
 from imrl.environment.environment import Environment
 from imrl.agent.option.option import Subgoal
+from imrl.environment.gridworld import GridPosition
 
 
 class CombinationLock(Environment):
@@ -20,12 +21,6 @@ class CombinationLock(Environment):
         self.m_actions = m_actions
         self.solution = solution
         self.failure_rate = failure_rate
-        self.actions = []
-
-    def reset(self):
-        """Reset the combination lock to initial state and return it."""
-        self.actions = []
-        return self
 
     def num_states(self):
         """Total number of possible states."""
@@ -33,6 +28,10 @@ class CombinationLock(Environment):
 
     def reward_vector(self):
         return self.num_states() - 1
+
+    def grid_position_from_state(self, state):
+        """Return a coordinate pair based on the given state vector."""
+        return GridPosition(state % self.num_states(), state // self.num_states())
 
     def reward(self, state):
         # TODO
@@ -46,26 +45,28 @@ class CombinationLock(Environment):
         subgoal_states = list(islice(range(1, self.num_states() + 1), 0, None, self.l_tumbler_length))
         return list(map(Subgoal, subgoal_states))
 
-    def position_from_state(self, state):
-        """Given a state, return the internal position that corresponds to this."""
+    def actions_from_state(self, state):
+        """Given a state, return the list of actions that have been taken to get to this state."""
         return self.solution[:state]
 
-    def is_terminal(self):
-        """It's terminal if the the combination lock is unlocked or if the action taken is incorrect for the current tumbler."""
+    def is_terminal(self, actions):
+        """Return true if the agent has made a wrong move."""
         is_terminal = False
-        for x, y in zip(self.actions, self.solution):
+        for x, y in zip(actions, self.solution):
             if x != y:
                 is_terminal = True
                 break
-        if self.actions == self.solution:
+        if actions[:-1] == self.solution:
             is_terminal = True
         return is_terminal
 
     def next_state(self, state, action):
         """Apply the given action and return the next state.  This should never be called if state is already terminal."""
-        self.actions = self.actions + [action]
-        potential_position = self.position_from_state(state) + [action]
-        if random.random() > self.failure_rate and (not self.is_terminal() or potential_position == self.solution):
-            return state + 1
+        potential_position = self.actions_from_state(state) + [action]
+        if random.random() > self.failure_rate:
+            if self.is_terminal(potential_position):
+                return self.initial_state()
+            else:
+                return state + 1
         else:
             return state
