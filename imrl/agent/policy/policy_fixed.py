@@ -14,4 +14,7 @@ class FixedPolicy(Policy):
         self.action = action
 
     def choose_action(self, state):
+        return self.choose_action_from_fv(state)
+
+    def choose_action_from_fv(self, fv):
         return self.action

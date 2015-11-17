@@ -13,4 +13,7 @@ class RandomPolicy(Policy):
         super(RandomPolicy, self).__init__(num_actions)
 
     def choose_action(self, state):
+        return self.choose_action_from_fv(state)
+
+    def choose_action_from_fv(self, stfvate):
         return np.random.randint(self.num_actions)

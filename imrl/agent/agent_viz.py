@@ -14,10 +14,11 @@ class AgentViz:
         self.agent = agent
         self.num_options = num_options
         self.subplots = {}
-        fig, subplots = plt.subplots(3, num_options+1, figsize=(17, 12))
+        fig, subplots = plt.subplots(3, num_options+1, figsize=(22, 12))
         self.subplots['reward'] = subplots[0]
         self.subplots['vf'] = subplots[1]
         self.subplots['policy'] = subplots[2]
+        fig, self.samples = plt.subplots(1, 1)
 
         self.vf_divs = []
         self.reward_divs = []
@@ -44,7 +45,7 @@ class AgentViz:
 
     def update(self):
         """Update plots for the base policy, value function, and reward function and for each of three options."""
-        # self.plot_samples()
+        self.plot_samples()
         for i in range(self.num_options + 1):
             if i == 0 or (i > 0 and i + self.agent.num_actions - 1 in self.agent.options):
                 self.plot_reward(i)
@@ -71,7 +72,7 @@ class AgentViz:
         for s in self.state_samples:
             vals.append(np.dot(self.agent.fa.evaluate(s).T, reward))
         self.subplots['reward'][id].cla()
-        sc = self.subplots['reward'][id].scatter(self.grid_samples[:, 0], self.grid_samples[:, 1], s=180, c=vals)
+        sc = self.subplots['reward'][id].scatter(self.grid_samples[:, 0], self.grid_samples[:, 1], s=180, c=vals, cmap='Greens')
         plt.colorbar(sc, cax=self.reward_divs[id])
 
     def plot_vf(self, id):
@@ -80,7 +81,7 @@ class AgentViz:
         for s in self.state_samples:
             vals.append(np.dot(self.agent.fa.evaluate(s).T, theta))
         self.subplots['vf'][id].cla()
-        sc = self.subplots['vf'][id].scatter(self.grid_samples[:, 0], self.grid_samples[:, 1], s=180, c=vals)
+        sc = self.subplots['vf'][id].scatter(self.grid_samples[:, 0], self.grid_samples[:, 1], s=180, c=vals, cmap='Greens')
         plt.colorbar(sc, cax=self.vf_divs[id])
 
     def plot_policy(self, id):
@@ -92,7 +93,10 @@ class AgentViz:
                         (a == Action.down and [0, -1]) or
                         (a == Action.left and [1, 0]) or  # Not sure why positive 1 yields a vector that points left
                         (a == Action.right and [-1, 0]) or
-                        [-1, -1])  # Option chosen
+                        (a == 4 and [-1, 1]) or
+                        (a == 5 and [1, -1]) or
+                        (a == 6 and [1, 1]) or
+                        (a == 7 and [1, -1]))
         vals = np.asarray(vals)
         self.subplots['policy'][id].cla()
         self.subplots['policy'][id].quiver(self.grid_samples[:, 0], self.grid_samples[:, 1], vals[:, 0], vals[:, 1],

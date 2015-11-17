@@ -10,4 +10,8 @@ class VIPolicy(Policy):
         self.vi = vi
 
     def choose_action(self, state):
-        return self.vi.get_max_action(state)
+        fv = self.vi.agent.fa.evaluate(state)
+        return self.choose_action_from_fv(fv)
+
+    def choose_action_from_fv(self, fv):
+        return self.vi.get_max_action(fv)
