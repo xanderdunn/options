@@ -12,7 +12,7 @@ from imrl.environment.gridworld import GridPosition
 def test_taking_correct_actions():
     """Does the environment correctly change the state when told to take an action with and without stochasticity?"""
     random.seed()
-    environment = CombinationLock(3, 1, 6, [1, 5, 4], 0.0)
+    environment = CombinationLock(3, 3, 6, 0.0, [1, 5, 4])
 
     assert environment.actions_from_state(0) == []
     assert environment.actions_from_state(1) == [1]
@@ -43,16 +43,16 @@ def test_taking_correct_actions():
 
 def test_subgoals():
     """Test that the right subgoals are set."""
-    environment = CombinationLock(3, 1, 6, [1, 5, 4], 0.0)
+    environment = CombinationLock(3, 3, 6, 0.0, [1, 5, 4])
 
-    assert environment.num_states() == 3
+    assert environment.num_states() == 9
 
-    assert environment.create_subgoals() == [Subgoal(1), Subgoal(2), Subgoal(3)]
+    assert environment.create_subgoals() == [Subgoal(2), Subgoal(5), Subgoal(8)]
 
 
 def test_grid_position():
     """Are the grid positions correct?"""
-    environment = CombinationLock(3, 1, 6, [1, 5, 4], 0.0)
+    environment = CombinationLock(3, 3, 6, [1, 5, 4], 0.0)
     assert environment.grid_position_from_state(2) == GridPosition(2, 0)
     assert environment.grid_position_from_state(3) == GridPosition(0, 1)
 

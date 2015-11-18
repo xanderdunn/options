@@ -32,8 +32,8 @@ def test_discrete_gridworld_experiment():
     gridworld_size = 3
     environment = Gridworld(gridworld_size, 0.0)
     experiment_description = ExperimentDescriptor(5, 100)
-    agent = Agent(RandomPolicy(environment.num_actions), TabularFA(environment.num_states()),
-                  environment.reward_vector(), environment.num_actions, 0.1, 0.99, 0.1, 0.05, 10, 0, 0)
+    agent = Agent(RandomPolicy(environment.num_actions), TabularFA(environment.num_states(), environment.num_actions), environment.num_actions,
+                  0.1, 0.99, 0.1, 0.1, 0.05, 10, 0, 0)
     results_path = os.path.join(os.getcwd(), 'results.txt')
     results_descriptor = ResultsDescriptor(100, results_path, ['interval_id', 'steps'])
     start(experiment_description, agent, environment, results_descriptor)

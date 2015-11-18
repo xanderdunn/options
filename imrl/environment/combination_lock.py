@@ -4,6 +4,9 @@
 import random
 from itertools import islice
 
+# Third party
+import numpy as np
+
 # First party
 from imrl.environment.environment import Environment
 from imrl.agent.option.option import Subgoal
@@ -11,15 +14,19 @@ from imrl.environment.gridworld import GridPosition
 
 
 class CombinationLock(Environment):
-    """
-    A combination lock has N tumblers of length L.  Each tumbler's sequence of potentially M numbers must be satisfied in order to unlock the combination lock.  The lock's solution and the lock's current internal position are simply represented as a list of integers.
-    """
+    """A combination lock instance has N tumblers, each of which requires L correct actions to set.
+    Actions are chosen from a set of size M.  The lock's solution is represented as a list of integers,
+    which is the correct sequence of actions."""
 
-    def __init__(self, n_tumblers, l_tumbler_length, m_actions, solution, failure_rate):
+    def __init__(self, n_tumblers, l_tumbler_length, num_actions, failure_rate, solution=None):
+        super(CombinationLock, self).__init__(num_actions)
         self.n_tumblers = n_tumblers
         self.l_tumbler_length = l_tumbler_length
-        self.m_actions = m_actions
-        self.solution = solution
+        self.size = l_tumbler_length
+        if not solution:
+            self.solution = [self.num_actions-1] * self.num_states()
+        else:
+            self.solution = solution
         self.failure_rate = failure_rate
 
     def num_states(self):
@@ -31,7 +38,7 @@ class CombinationLock(Environment):
 
     def grid_position_from_state(self, state):
         """Return a coordinate pair based on the given state vector."""
-        return GridPosition(state % self.num_states(), state // self.num_states())
+        return GridPosition(state % self.size, state // self.size)
 
     def reward(self, state):
         # TODO
@@ -42,7 +49,7 @@ class CombinationLock(Environment):
         return 0
 
     def create_subgoals(self):
-        subgoal_states = list(islice(range(1, self.num_states() + 1), 0, None, self.l_tumbler_length))
+        subgoal_states = list(range(self.l_tumbler_length - 1, self.num_states(), self.l_tumbler_length))
         return list(map(Subgoal, subgoal_states))
 
     def actions_from_state(self, state):
@@ -64,7 +71,7 @@ class CombinationLock(Environment):
         """Apply the given action and return the next state.  This should never be called if state is already terminal."""
         potential_position = self.actions_from_state(state) + [action]
         if random.random() > self.failure_rate:
-            if self.is_terminal(potential_position):
+            if self.is_terminal(potential_position) or state == self.num_states() - 1:
                 return self.initial_state()
             else:
                 return state + 1

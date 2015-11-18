@@ -28,10 +28,7 @@ def run_step(step_data, environment):
     state = step_data.state
     agent = step_data.agent
     action = agent.policy.choose_action(state)
-    if environment.is_terminal(step_data.state):
-        state_prime = environment.initial_state()
-    else:
-        state_prime = environment.next_state(state, action)
+    state_prime = environment.next_state(state, action)
     agent.update(state, action, state_prime)
     return StepData(state_prime, action, step_data.step_id + 1, agent)
 
@@ -44,6 +41,8 @@ def generate_state(agent, environment):
 
 def run_interval(interval_id, initial_agent, environment, interval_steps):
     """Run through a single planning interval.  Returns the results for that interval."""
+    if interval_id > 0:
+        initial_agent.policy = initial_agent.vi_policy
     logging.info('Starting interval {}'.format(interval_id))
     for step_data in generate_state(initial_agent, environment):
         if step_data.step_id == interval_steps:
