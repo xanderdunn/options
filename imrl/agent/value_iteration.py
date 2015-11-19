@@ -9,7 +9,7 @@ import numpy as np
 
 class ValueIteration:
 
-    def __init__(self, id, reward_functions, agent, iterations, retain_theta=False, use_options=False, alpha=0.1, gamma=0.99):
+    def __init__(self, id, reward_functions, agent, iterations, retain_theta=True, use_options=False, alpha=0.1, gamma=0.99):
         self.id = id
         self.agent = agent
         self.r = reward_functions

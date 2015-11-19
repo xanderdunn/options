@@ -16,14 +16,14 @@ def test_uom_update():
     assert option.m.shape == (9, 9)
     assert option.u.shape == (9, 9)
     state = 0
-    state_prime = 1
+    state_prime = 2
     fv = option.fa.evaluate(state)
     fv_prime = option.fa.evaluate(state_prime)
     m_prime = option.update_m(fv, fv_prime, 1.0)
     zeros_matrix = np.zeros((9, 9))
-    zeros_matrix[1, 0] = option.gamma * option.eta
+    zeros_matrix[2, 0] = option.gamma * option.eta
     assert np.array_equal(zeros_matrix, m_prime)
-    u_prime = option.update_u(fv)
-    zeros_matrix = np.zeros((9, 9))
-    zeros_matrix[0, 0] = option.eta
-    assert np.array_equal(zeros_matrix, u_prime)
+    u_prime = option.update_u(fv, fv_prime)
+    identity = np.eye(9, 9)
+    # identity[2, 0] = option.eta * option.gamma
+    assert np.array_equal(identity, u_prime)

@@ -80,8 +80,8 @@ def main(argv):
     fa = ((args.environment == 'gridworld' or args.environment == 'combo_lock') and
           TabularFA(environment.size * environment.size, environment.num_actions)) or \
         (args.environment == 'gridworld_continuous' and RBF(2, 7, environment.num_actions, beta=args.beta))
-    agent = Agent(policy, fa, environment.num_actions, args.alpha, args.gamma, args.eta,
-                  args.zeta, args.epsilon, args.num_vi, args.sim_samples, args.sim_steps, subgoals=environment.create_subgoals())
+    agent = Agent(policy, fa, environment.num_actions, args.alpha, args.gamma, args.eta, args.zeta, args.epsilon,
+                  args.num_vi, args.sim_samples, args.sim_steps, retain_theta=args.retain_theta, subgoals=environment.create_subgoals())
     if args.agent_viz:
         agent.create_visualization(args.environment == 'gridworld' or args.environment == 'combo_lock', environment)
     # agent.exploit(np.asarray([1, 1]))

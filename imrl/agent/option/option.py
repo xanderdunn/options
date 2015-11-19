@@ -34,7 +34,7 @@ class Option:
         self.policy = policy
         self.num_actions = num_actions
         self.m = np.zeros((fa.num_features, fa.num_features))
-        self.u = np.zeros((fa.num_features, fa.num_features))
+        self.u = np.eye(fa.num_features, fa.num_features)
         self.eta = eta
         self.gamma = gamma
         if subgoal:
@@ -59,11 +59,19 @@ class Option:
         """Calculate the expected return for executing the option in the given state given the reward function r."""
         return self.get_return(r, self.fa.evaluate(s))
 
+    def can_init_from_state(self, s):
+        """Return true if option is initializable from state s."""
+        self.can_init_from_fv(self.fa.evaluate(s))
+
+    def can_init_from_fv(self, fv):
+        """Return true if option is initializable from feature vector fv."""
+        return True  # TODO implement per domain
+
     def is_terminal(self, fv):
         """Returns true if the option terminates in the given feature vector."""
         if self.id < self.num_actions:
             return True
-        if np.linalg.norm((fv - self.subgoal_fv)) <= 0.1:
+        if np.linalg.norm((fv - self.subgoal_fv), 2) <= 0.1:
             return True
         return False
 
@@ -85,9 +93,11 @@ class Option:
         self.m = m_prime
         return m_prime
 
-    def update_u(self, fv):
+    def update_u(self, fv, fv_prime):
         """Given the current matrix U and the previous feature vector fv, return the updated matrix U."""
-        u_prime = self.u + self.eta * np.dot(fv - np.dot(self.u, fv), fv.T)
+        successor_val = np.zeros((self.fa.num_features, 1)) if self.is_terminal(fv_prime) else np.dot(self.u, fv_prime)
+        delta = fv + self.gamma * successor_val - np.dot(self.u, fv)
+        u_prime = self.u + self.eta * np.dot(delta, fv.T)
         assert u_prime.shape == self.u.shape, 'The updated U\' must have the same shape as the previous U.'
         self.u = u_prime
         return u_prime

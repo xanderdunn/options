@@ -16,7 +16,7 @@ class Experiment2:
         while self.step < self.max_steps:
             self.run_interval()
             self.agent.plan()
-            if self.agent.viz and self.step % 10000 == 0:
+            if self.agent.viz and self.step % 1000 == 0:
                 self.agent.viz.update()
 
     def run_interval(self):
