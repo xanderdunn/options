@@ -27,7 +27,7 @@ def run_step(step_data, environment):
     """Given the current state, choose an action to take and return the new environment state."""
     state = step_data.state
     agent = step_data.agent
-    action = agent.policy.choose_action(state)
+    action = agent.choose_action(state)
     state_prime = environment.next_state(state, action)
     agent.update(state, action, state_prime)
     return StepData(state_prime, action, step_data.step_id + 1, agent)

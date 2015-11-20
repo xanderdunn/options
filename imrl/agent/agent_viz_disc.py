@@ -22,7 +22,7 @@ class AgentVizDisc(AgentViz):
             self.state_samples.append(i)
 
     def update_plot_limits(self):
-        for i in range(self.num_options):
+        for i in range(self.num_options + 1):
             self.subplots['policy'][i].set_xlim([-1, self.gridworld.size])
             self.subplots['policy'][i].set_ylim([-1, self.gridworld.size])
 

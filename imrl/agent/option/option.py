@@ -93,9 +93,9 @@ class Option:
         self.m = m_prime
         return m_prime
 
-    def update_u(self, fv, fv_prime):
+    def update_u(self, fv, fv_prime, terminal):
         """Given the current matrix U and the previous feature vector fv, return the updated matrix U."""
-        successor_val = np.zeros((self.fa.num_features, 1)) if self.is_terminal(fv_prime) else np.dot(self.u, fv_prime)
+        successor_val = np.zeros((self.fa.num_features, 1)) if terminal else np.dot(self.u, fv_prime)
         delta = fv + self.gamma * successor_val - np.dot(self.u, fv)
         u_prime = self.u + self.eta * np.dot(delta, fv.T)
         assert u_prime.shape == self.u.shape, 'The updated U\' must have the same shape as the previous U.'

@@ -16,7 +16,7 @@ class Experiment2:
         while self.step < self.max_steps:
             self.run_interval()
             self.agent.plan()
-            if self.agent.viz and self.step % 1000 == 0:
+            if self.agent.viz and self.step % 100 == 0:
                 self.agent.viz.update()
 
     def run_interval(self):
@@ -24,7 +24,7 @@ class Experiment2:
             self.agent.policy = self.agent.vi_policy
         logging.info('Starting interval {}'.format(self.interval))
         while True:
-            a = self.agent.policy.choose_action(self.s)
+            a = self.agent.choose_action(self.s)
             s_prime = self.environment.next_state(self.s, a)
             self.agent.update(self.s, a, s_prime)
             self.s = s_prime

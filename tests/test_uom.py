@@ -23,7 +23,7 @@ def test_uom_update():
     zeros_matrix = np.zeros((9, 9))
     zeros_matrix[2, 0] = option.gamma * option.eta
     assert np.array_equal(zeros_matrix, m_prime)
-    u_prime = option.update_u(fv, fv_prime)
+    u_prime = option.update_u(fv, fv_prime, False)
     identity = np.eye(9, 9)
-    # identity[2, 0] = option.eta * option.gamma
+    identity[2, 0] = option.eta * option.gamma
     assert np.array_equal(identity, u_prime)

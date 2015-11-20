@@ -20,52 +20,77 @@ class Agent:
                  retain_theta=True, subgoals=[], samples=[]):
         self.policy = policy
         self.fa = fa
-        self.plan_iterations = plan_iter
         self.num_actions = num_actions
         self.alpha = alpha
         self.gamma = gamma
         self.eta = eta
         self.zeta = zeta
         self.epsilon = epsilon
-        self.samples = samples
+        self.plan_iterations = plan_iter
         self.sim_samples = sim_samples
         self.sim_steps = sim_steps
         self.subgoals = subgoals
+        self.samples = samples
         self.reached_subgoals = []
-        self.viz = None
         self.extrinsic = None
         self.intrinsic = [np.ones((self.fa.num_features, 1))] * num_actions
         self.options = {i: Option(i, fa, FixedPolicy(num_actions, i), eta, gamma, None, num_actions) for i in range(num_actions)}
-        self.vi = ValueIteration(-1, self.intrinsic, self, plan_iter, retain_theta=retain_theta, use_options=True, alpha=alpha, gamma=gamma)
+        self.vi = ValueIteration(-1, self.intrinsic, self, plan_iter, retain_theta=retain_theta, use_options=False, alpha=alpha, gamma=gamma)
         self.vi_policy = VIPolicy(num_actions, self.vi)
+        self.option_stack = []
+        self.step = 0
+        self.viz = None
 
     def create_visualization(self, discrete=False, gridworld=None):
         num_options = min(4, len(self.subgoals))
         self.viz = AgentVizDisc(self, num_options, gridworld) if discrete else AgentViz(self, num_options)
 
     def choose_action(self, state):
-        return
+        """Select an action from the base policy and add to option stack if necessary."""
+        fv = self.fa.evaluate(state)
+        if not self.option_stack:  # No executing options
+            o = self.policy.choose_action(state)
+            self.option_stack.append((o, fv, self.step))
+        else:
+            o, _, _ = self.option_stack[-1]
+        while o >= self.num_actions:  # Option selected
+            o = self.options[o].policy.choose_action_from_fv(fv)
+            self.option_stack.append((o, fv, self.step))
+        # print([x[0] for x in self.option_stack])
+        return o
 
     def update(self, state, action, state_prime):
-        """Update an agent with options and return the new agent."""
-        tau = 1  # Compute later from option stack for non-primitive options
+        """Update an agent's models based on a state, action, state tuple."""
         fv = self.fa.evaluate(state)
         fv_prime = self.fa.evaluate(state_prime)
-        o = self.options[action]
-        o.update_m(fv, fv_prime, tau)
-        o.update_u(fv, fv_prime)
+        assert self.option_stack != []
+        o_idx, fv_old, start = self.option_stack[-1]
+        assert o_idx == action
+        tau = self.step - start
+        assert tau == 0
+        o = self.options[o_idx]
+        while o.is_terminal_in_state(state_prime):
+            str(self.option_stack.pop()[0])
+            o.update_m(fv_old, fv_prime, tau)
+            o.update_u(fv, fv_prime, True)
+            if not self.option_stack:
+                break
+            o_idx, fv_old, start = self.option_stack[-1]
+            tau = self.step - start
+            o = self.options[o_idx]
+        for o, _, _ in self.option_stack:
+            self.options[o].update_u(fv, fv_prime, False)
         self.evaluate_sample(state)
         self.evaluate_subgoal(state)
         self.update_intrinsic_reward(state, action)
+        self.step += 1
 
     def update_intrinsic_reward(self, state, action):
         fv = self.fa.evaluate(state)
         self.intrinsic[action] = self.intrinsic[action] + self.zeta * (0 - np.dot(self.intrinsic[action].T, fv)) * fv
-        self.explore()
 
     def explore(self):
         self.vi.r = self.intrinsic
-        # self.policy = self.vi_policy
 
     def exploit(self, goal):
         self.extrinsic = [self.fa.evaluate(goal)]
@@ -134,7 +159,7 @@ class Agent:
         for i in range(steps):
             a = o.policy.choose_action_from_fv(s)
             s_prime = self.options[a].get_next_fv(s)
-            o.update_u(s, s_prime)
+            o.update_u(s, s_prime, o.is_terminal(s_prime))
             self.intrinsic[o.id] = self.intrinsic[o.id] + (np.dot(self.intrinsic[a].T, s) - np.dot(self.intrinsic[o.id].T, s)) * s
             if o.is_terminal(s_prime):
                 # print('Sim terminated - ' + str(o.id - self.num_actions + 1))

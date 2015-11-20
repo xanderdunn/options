@@ -25,6 +25,8 @@ class CombinationLock(Environment):
         self.size = l_tumbler_length
         if not solution:
             self.solution = [self.num_actions-1] * self.num_states()
+            for i in range(self.num_actions-1):
+                self.solution[i*self.l_tumbler_length:(i+1)*self.l_tumbler_length] = [i] * self.l_tumbler_length
         else:
             self.solution = solution
         self.failure_rate = failure_rate

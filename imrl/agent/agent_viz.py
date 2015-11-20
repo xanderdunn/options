@@ -57,7 +57,7 @@ class AgentViz:
         plt.pause(0.00001)
 
     def update_plot_limits(self):
-        for i in range(self.num_options):
+        for i in range(self.num_options + 1):
             self.subplots['policy'][i].set_xlim([-0.1, 1.1])
             self.subplots['policy'][i].set_ylim([-0.1, 1.1])
 
