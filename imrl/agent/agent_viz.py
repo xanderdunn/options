@@ -95,10 +95,10 @@ class AgentViz:
                         (a == Action.down and [0, -1]) or
                         (a == Action.left and [-1, 0]) or
                         (a == Action.right and [1, 0]) or
-                        (a == 4 and [-1, 1]) or
+                        (a == 4 and [1, 1]) or
                         (a == 5 and [1, -1]) or
-                        (a == 6 and [1, 1]) or
-                        (a == 7 and [1, -1]))
+                        (a == 6 and [-1, 1]) or
+                        (a == 7 and [-1, -1]))
             colors.append(0.5 if a < self.agent.num_actions else 1)
         vals = np.asarray(vals)
         self.subplots['policy'][id].cla()

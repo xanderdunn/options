@@ -51,7 +51,7 @@ class CombinationLock(Environment):
         return 0
 
     def create_subgoals(self):
-        subgoal_states = list(range(self.l_tumbler_length - 1, self.num_states(), self.l_tumbler_length))
+        subgoal_states = list(range(self.l_tumbler_length, self.num_states() + 1, self.l_tumbler_length))
         return list(map(Subgoal, subgoal_states))
 
     def actions_from_state(self, state):

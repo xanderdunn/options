@@ -35,7 +35,7 @@ class Agent:
         self.extrinsic = None
         self.intrinsic = [np.ones((self.fa.num_features, 1))] * num_actions
         self.options = {i: Option(i, fa, FixedPolicy(num_actions, i), eta, gamma, None, num_actions) for i in range(num_actions)}
-        self.vi = ValueIteration(-1, self.intrinsic, self, plan_iter, retain_theta=retain_theta, use_options=False, alpha=alpha, gamma=gamma)
+        self.vi = ValueIteration(-1, self.intrinsic, self, plan_iter, retain_theta=retain_theta, use_options=True, alpha=alpha, gamma=gamma)
         self.vi_policy = VIPolicy(num_actions, self.vi)
         self.option_stack = []
         self.step = 0
@@ -70,7 +70,7 @@ class Agent:
         assert tau == 0
         o = self.options[o_idx]
         while o.is_terminal_in_state(state_prime):
-            str(self.option_stack.pop()[0])
+            self.option_stack.pop()
             o.update_m(fv_old, fv_prime, tau)
             o.update_u(fv, fv_prime, True)
             if not self.option_stack:
