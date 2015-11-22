@@ -145,7 +145,8 @@ class Agent:
 
         # Simulate option policies to learn option models
         for i in range(self.num_actions, len(self.options)):
-            for s in random.sample(self.samples, min(self.sim_samples, len(self.samples))):
+            samples = self.options[i].get_init_set()
+            for s in random.sample(samples, min(self.sim_samples, len(samples))):
                 self.simulate_policy(self.options[i], s, self.sim_steps)
 
         # Compute base policy

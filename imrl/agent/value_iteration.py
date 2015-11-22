@@ -34,7 +34,11 @@ class ValueIteration:
             option_set = [o for i, o in self.agent.options.items() if i != self.id]
         else:
             option_set = [o for i, o in self.agent.options.items() if i < self.agent.num_actions]
-        for s in self.agent.samples:
+        if self.id >= self.agent.num_actions:
+            samples = self.agent.options[self.id].get_init_set()
+        else:
+            samples = self.agent.samples
+        for s in samples:
             theta = self.backup(theta, s, option_set)
         return theta
 

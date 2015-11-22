@@ -61,11 +61,14 @@ class Option:
 
     def can_init_from_state(self, s):
         """Return true if option is initializable from state s."""
-        self.can_init_from_fv(self.fa.evaluate(s))
+        return self.can_init_from_fv(self.fa.evaluate(s))
 
     def can_init_from_fv(self, fv):
         """Return true if option is initializable from feature vector fv."""
-        return True  # TODO implement per domain
+        return self.id < self.num_actions or np.argmax(fv) <= self.subgoal.state  # TODO only works for combo lock
+
+    def get_init_set(self):
+        return [s for s in self.policy.vi.agent.samples if self.can_init_from_state(s)]
 
     def is_terminal(self, fv):
         """Returns true if the option terminates in the given feature vector."""
