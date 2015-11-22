@@ -22,31 +22,32 @@ GridPosition = namedtuple('GridPosition', ('x', 'y'))
 
 
 class Gridworld(Environment):
-    """Discrete gridworld implementation. Assumes square shape."""
+    """Discrete gridworld implementation."""
 
-    def __init__(self, size, failure_rate, num_actions=4):
+    def __init__(self, width, height, failure_rate, num_actions=4):
         super(Gridworld, self).__init__(num_actions)
-        self.size = size
+        self.width = width
+        self.height = height
         self.failure_rate = failure_rate
 
     def num_states(self):
-        return self.size * self.size
+        return self.width * self.height
 
     def exhaustive_states(self):
         return [one_hot_vector(self.num_states(), i) for i in range(self.num_states())]
 
     def grid_position_from_state(self, state):
         """Returns a coordinate pair based on the given state vector."""
-        return GridPosition(state % self.size, state // self.size)
+        return GridPosition(state % self.width, state // self.width)
 
     def state_from_grid_position(self, position):
         """Returns a state index from a grid position."""
-        return int(position.x + self.size * position.y)
+        return int(position.x + self.width * position.y)
 
     def create_subgoals(self):
-        return [Subgoal(self.state_from_grid_position(GridPosition(self.size//2, self.size//2))),
-                Subgoal(self.state_from_grid_position(GridPosition(self.size-1, 0))),
-                Subgoal(self.state_from_grid_position(GridPosition(0, self.size-1)))]
+        return [Subgoal(self.state_from_grid_position(GridPosition(self.width//2, self.height//2))),
+                Subgoal(self.state_from_grid_position(GridPosition(self.width-1, 0))),
+                Subgoal(self.state_from_grid_position(GridPosition(0, self.height-1)))]
 
     def reward_vector(self):
         return self.num_states() - 1
@@ -61,7 +62,7 @@ class Gridworld(Environment):
 
     def is_terminal(self, state):
         """The corner (size-1, size-1) is a terminal state."""
-        return state == self.size * self.size - 1
+        return state == self.num_states() - 1
 
     def next_state(self, state, action):
         """Apply the given action and return the next state."""
@@ -73,6 +74,6 @@ class Gridworld(Environment):
                               (mapped_action == Action.down and GridPosition(position.x, position.y - 1)) or \
                               (mapped_action == Action.left and GridPosition(position.x + 1, position.y)) or \
                               (mapped_action == Action.right and GridPosition(position.x - 1, position.y))
-            if 0 <= tentative_state.x < self.size and 0 <= tentative_state.y < self.size:
+            if 0 <= tentative_state.x < self.width and 0 <= tentative_state.y < self.height:
                 next_state = tentative_state
         return self.state_from_grid_position(next_state)

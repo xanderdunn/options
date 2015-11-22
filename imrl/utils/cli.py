@@ -29,15 +29,16 @@ def parse_args(argv):
     gamma = 0.99
     epsilon = 0.1
     beta = 80
-    plan_interval = 12
+    plan_interval = 10
     num_vi = 1
     retain_theta = True
     sim_samples = 25
     sim_steps = 25
     agent_viz = True
-    viz_steps = 1000
+    viz_steps = 100
     environment = 'gridworld'
-    gridworld_size = 11
+    gridworld_width = 5
+    gridworld_height = 10
     failure_rate = 0
 
     parser = argparse.ArgumentParser()
@@ -69,7 +70,8 @@ def parse_args(argv):
     # Environment
     parser.add_argument('--environment', help='Choose the environment.',
                         choices=['gridworld', 'gridworld_continuous', 'combo_lock'], default=environment)
-    parser.add_argument('--gridworld_size', help='Gridworld is size * size', type=int, default=gridworld_size)
+    parser.add_argument('--gridworld_width', help='Gridworld is width * height', type=int, default=gridworld_width)
+    parser.add_argument('--gridworld_height', help='Gridworld is width * height', type=int, default=gridworld_height)
     parser.add_argument('--failure_rate', help='The percent of actions in this environment that fail.', type=float, default=failure_rate)
     return parser.parse_args(argv)
 
@@ -91,12 +93,12 @@ def main(argv):
     args = parse_args(argv)
     random.seed(args.seed)
     logging.basicConfig(level=log_level(args.log_level))
-    environment = (args.environment == 'gridworld' and Gridworld(args.gridworld_size, args.failure_rate)) or \
+    environment = (args.environment == 'gridworld' and Gridworld(args.gridworld_width, args.gridworld_height, args.failure_rate)) or \
                   (args.environment == 'gridworld_continuous' and GridworldContinuous(0.1, 0.01)) or \
-                  (args.environment == 'combo_lock' and CombinationLock(args.gridworld_size, args.gridworld_size, 4, args.failure_rate))
+                  (args.environment == 'combo_lock' and CombinationLock(args.gridworld_height, args.gridworld_width, 4, args.failure_rate))
     policy = (args.agent_policy == 'random' and RandomPolicy(environment.num_actions))
     fa = ((args.environment == 'gridworld' or args.environment == 'combo_lock') and
-          TabularFA(environment.size * environment.size, environment.num_actions)) or \
+          TabularFA(environment.num_states(), environment.num_actions)) or \
         (args.environment == 'gridworld_continuous' and RBF(2, 7, environment.num_actions, beta=args.beta))
     agent = Agent(policy, fa, environment.num_actions, args.alpha, args.gamma, args.eta, args.zeta, args.epsilon,
                   args.num_vi, args.sim_samples, args.sim_steps, retain_theta=args.retain_theta, subgoals=environment.create_subgoals())

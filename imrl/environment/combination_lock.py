@@ -2,53 +2,27 @@
 
 # System
 import random
-from itertools import islice
-
-# Third party
-import numpy as np
 
 # First party
-from imrl.environment.environment import Environment
 from imrl.agent.option.option import Subgoal
-from imrl.environment.gridworld import GridPosition
+from imrl.environment.gridworld import GridPosition, Gridworld
 
 
-class CombinationLock(Environment):
+class CombinationLock(Gridworld):
     """A combination lock instance has N tumblers, each of which requires L correct actions to set.
     Actions are chosen from a set of size M.  The lock's solution is represented as a list of integers,
     which is the correct sequence of actions."""
 
     def __init__(self, n_tumblers, l_tumbler_length, num_actions, failure_rate, solution=None):
-        super(CombinationLock, self).__init__(num_actions)
+        super(CombinationLock, self).__init__(l_tumbler_length, n_tumblers, failure_rate, num_actions)
         self.n_tumblers = n_tumblers
         self.l_tumbler_length = l_tumbler_length
-        self.size = l_tumbler_length
         if not solution:
             self.solution = [self.num_actions-1] * self.num_states()
             for i in range(self.num_actions-1):
                 self.solution[i*self.l_tumbler_length:(i+1)*self.l_tumbler_length] = [i] * self.l_tumbler_length
         else:
             self.solution = solution
-        self.failure_rate = failure_rate
-
-    def num_states(self):
-        """Total number of possible states."""
-        return self.n_tumblers * self.l_tumbler_length
-
-    def reward_vector(self):
-        return self.num_states() - 1
-
-    def grid_position_from_state(self, state):
-        """Return a coordinate pair based on the given state vector."""
-        return GridPosition(state % self.size, state // self.size)
-
-    def reward(self, state):
-        # TODO
-        return 0.0
-
-    def initial_state(self):
-        """Always start the lock with no tumblers set."""
-        return 0
 
     def create_subgoals(self):
         subgoal_states = list(range(self.l_tumbler_length, self.num_states() + 1, self.l_tumbler_length))
