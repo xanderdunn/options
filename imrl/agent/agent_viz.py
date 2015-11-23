@@ -13,12 +13,12 @@ class AgentViz:
     def __init__(self, agent, num_options):
         self.agent = agent
         self.num_options = num_options
+        fig, self.samples = plt.subplots(1, 1, figsize=(3, 3))
         self.subplots = {}
         fig, subplots = plt.subplots(3, num_options+1, figsize=(22, 12))
         self.subplots['reward'] = subplots[0]
         self.subplots['vf'] = subplots[1]
         self.subplots['policy'] = subplots[2]
-        fig, self.samples = plt.subplots(1, 1)
 
         self.vf_divs = []
         self.reward_divs = []
@@ -57,7 +57,7 @@ class AgentViz:
         plt.pause(0.00001)
 
     def update_plot_limits(self):
-        for i in range(self.num_options):
+        for i in range(self.num_options + 1):
             self.subplots['policy'][i].set_xlim([-0.1, 1.1])
             self.subplots['policy'][i].set_ylim([-0.1, 1.1])
 
@@ -67,7 +67,8 @@ class AgentViz:
                              np.asarray([self.agent.samples[i][1] for i in range(len(self.agent.samples))]))
 
     def plot_reward(self, id):
-        reward = self.agent.vi_policy.vi.r if id == 0 else self.agent.options[id + self.agent.num_actions - 1].policy.vi.r
+        reward = np.amax(np.asarray(self.agent.vi_policy.vi.r), axis=0) if id == 0 \
+            else self.agent.options[id + self.agent.num_actions - 1].policy.vi.r[0]
         vals = []
         for s in self.state_samples:
             vals.append(np.dot(self.agent.fa.evaluate(s).T, reward))
@@ -87,17 +88,24 @@ class AgentViz:
     def plot_policy(self, id):
         policy = self.agent.vi_policy if id == 0 else self.agent.options[id + self.agent.num_actions - 1].policy
         vals = []
-        for s in self.state_samples:
+        colors = []
+        if id == 0:
+            samples = self.state_samples
+        else:
+            samples = self.agent.options[id + self.agent.num_actions - 1].get_init_set()
+        for s in samples:
             a = int(policy.choose_action(s))
             vals.append((a == Action.up and [0, 1]) or
                         (a == Action.down and [0, -1]) or
-                        (a == Action.left and [1, 0]) or  # Not sure why positive 1 yields a vector that points left
-                        (a == Action.right and [-1, 0]) or
-                        (a == 4 and [-1, 1]) or
+                        (a == Action.left and [-1, 0]) or
+                        (a == Action.right and [1, 0]) or
+                        (a == 4 and [1, 1]) or
                         (a == 5 and [1, -1]) or
-                        (a == 6 and [1, 1]) or
-                        (a == 7 and [1, -1]))
+                        (a == 6 and [-1, 1]) or
+                        (a == 7 and [-1, -1]) or
+                        [0, 0])
+            colors.append(0.5 if a < self.agent.num_actions else 1)
         vals = np.asarray(vals)
         self.subplots['policy'][id].cla()
         self.subplots['policy'][id].quiver(self.grid_samples[:, 0], self.grid_samples[:, 1], vals[:, 0], vals[:, 1],
-                           pivot='middle', headwidth=4, headlength=6)
+                                           colors, pivot='middle', headwidth=4, headlength=6)
