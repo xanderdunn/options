@@ -47,7 +47,7 @@ def test_subgoals():
 
     assert environment.num_states() == 9
 
-    assert environment.create_subgoals() == [Subgoal(3), Subgoal(6), Subgoal(9)]
+    assert environment.create_subgoals() == [Subgoal(2), Subgoal(5), Subgoal(8)]
 
 
 def test_grid_position():

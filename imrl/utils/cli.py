@@ -11,7 +11,7 @@ import os
 # IMRL
 from imrl.interface.experiment import start, ExperimentDescriptor
 from imrl.agent.agent import Agent
-from imrl.agent.policy.policy_random import RandomPolicy
+from imrl.agent.policy.policy_random import RandomPolicy, RandomOptionPolicy
 from imrl.agent.fa.tabular import TabularFA
 from imrl.agent.fa.rbf import RBF
 from imrl.environment.gridworld import Gridworld
@@ -23,9 +23,9 @@ from imrl.interface.experiment2 import Experiment2
 
 def parse_args(argv):
     """Create command line arguments parser."""
-    alpha = 1
-    eta = 1
-    zeta = 1
+    alpha = 0.1
+    eta = 0.1
+    zeta = 0.1
     gamma = 0.99
     epsilon = 0.1
     beta = 80
@@ -34,18 +34,19 @@ def parse_args(argv):
     retain_theta = True
     sim_samples = 25
     sim_steps = 25
+    random_options = False
     agent_viz = True
-    viz_steps = 100
+    viz_steps = 50
     environment = 'gridworld'
     gridworld_width = 5
-    gridworld_height = 10
-    failure_rate = 0
+    gridworld_height = 5
+    failure_rate = 0.1
 
     parser = argparse.ArgumentParser()
 
     # General
     parser.add_argument('--seed', help='Seed with which to initialize random number generator.', type=int)
-    parser.add_argument('--num_steps', help='Number of steps for which to run the experiment.', type=int, default=1000000)
+    parser.add_argument('--num_steps', help='Number of steps for which to run the experiment.', type=int, default=10000)
     parser.add_argument('--log_level', help='Set log level.', choices=['DEBUG', 'INFO', 'WARNING', 'ERROR'], default='WARNING')
     parser.add_argument('--results_interval', help='Log results out to terminal and file every n intervals.', type=int, default=50)
     parser.add_argument('--results_path', help='File path to save the results to. Default is results.txt in the current working directory.',
@@ -66,6 +67,7 @@ def parse_args(argv):
     parser.add_argument('--agent_policy', help='Choose the agent\'s initial policy.', choices=['random'], default='random')
     parser.add_argument("--agent_viz", action='store_true', default=agent_viz, help="Plot agent statistics during runs?")
     parser.add_argument('--viz_steps', help='Frequency with which to update agent visualization.', type=int, default=viz_steps)
+    parser.add_argument("--random_options", action='store_true', default=random_options, help="Should random policies select options when available?")
 
     # Environment
     parser.add_argument('--environment', help='Choose the environment.',
@@ -94,14 +96,15 @@ def main(argv):
     random.seed(args.seed)
     logging.basicConfig(level=log_level(args.log_level))
     environment = (args.environment == 'gridworld' and Gridworld(args.gridworld_width, args.gridworld_height, args.failure_rate)) or \
-                  (args.environment == 'gridworld_continuous' and GridworldContinuous(0.1, 0.01)) or \
+                  (args.environment == 'gridworld_continuous' and GridworldContinuous(0.2, 0.01)) or \
                   (args.environment == 'combo_lock' and CombinationLock(args.gridworld_height, args.gridworld_width, 4, args.failure_rate))
     policy = (args.agent_policy == 'random' and RandomPolicy(environment.num_actions))
     fa = ((args.environment == 'gridworld' or args.environment == 'combo_lock') and
           TabularFA(environment.num_states(), environment.num_actions)) or \
-        (args.environment == 'gridworld_continuous' and RBF(2, 7, environment.num_actions, beta=args.beta))
+        (args.environment == 'gridworld_continuous' and RBF(2, 5, environment.num_actions, beta=args.beta))
     agent = Agent(policy, fa, environment.num_actions, args.alpha, args.gamma, args.eta, args.zeta, args.epsilon,
                   args.num_vi, args.sim_samples, args.sim_steps, retain_theta=args.retain_theta, subgoals=environment.create_subgoals())
+    agent.policy = RandomOptionPolicy(agent, args.random_options)
     if args.agent_viz:
         agent.create_visualization(args.environment == 'gridworld' or args.environment == 'combo_lock', environment)
     # agent.exploit(np.asarray([1, 1]))

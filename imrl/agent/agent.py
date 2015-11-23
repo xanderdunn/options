@@ -87,7 +87,8 @@ class Agent:
 
     def update_intrinsic_reward(self, state, action):
         fv = self.fa.evaluate(state)
-        self.intrinsic[action] = self.intrinsic[action] + self.zeta * (0 - np.dot(self.intrinsic[action].T, fv)) * fv
+        self.intrinsic[action] = self.intrinsic[action] - self.zeta * np.dot(self.intrinsic[action].T, fv) * fv
+        assert np.max(self.vi.r[action]) <= 1.0
 
     def explore(self):
         self.vi.r = self.intrinsic

@@ -65,7 +65,7 @@ class Option:
 
     def can_init_from_fv(self, fv):
         """Return true if option is initializable from feature vector fv."""
-        return self.id < self.num_actions or np.argmax(fv) <= self.subgoal.state  # TODO only works for combo lock
+        return True  # self.id < self.num_actions or np.argmax(fv) <= self.subgoal.state  # TODO only works for combo lock
 
     def get_init_set(self):
         return [s for s in self.policy.vi.agent.samples if self.can_init_from_state(s)]

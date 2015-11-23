@@ -89,7 +89,11 @@ class AgentViz:
         policy = self.agent.vi_policy if id == 0 else self.agent.options[id + self.agent.num_actions - 1].policy
         vals = []
         colors = []
-        for s in self.state_samples:
+        if id == 0:
+            samples = self.state_samples
+        else:
+            samples = self.agent.options[id + self.agent.num_actions - 1].get_init_set()
+        for s in samples:
             a = int(policy.choose_action(s))
             vals.append((a == Action.up and [0, 1]) or
                         (a == Action.down and [0, -1]) or
@@ -98,7 +102,8 @@ class AgentViz:
                         (a == 4 and [1, 1]) or
                         (a == 5 and [1, -1]) or
                         (a == 6 and [-1, 1]) or
-                        (a == 7 and [-1, -1]))
+                        (a == 7 and [-1, -1]) or
+                        [0, 0])
             colors.append(0.5 if a < self.agent.num_actions else 1)
         vals = np.asarray(vals)
         self.subplots['policy'][id].cla()
