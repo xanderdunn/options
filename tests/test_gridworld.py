@@ -17,14 +17,14 @@ def test_taking_actions():
     # Deterministic tests
     assert env.next_state(env.initial_state(), Action.up) == env.state_from_grid_position(GridPosition(0, 1))
     assert env.next_state(env.initial_state(), Action.down) == env.state_from_grid_position(GridPosition(0, 0))
-    assert env.next_state(env.initial_state(), Action.left) == env.state_from_grid_position(GridPosition(1, 0))
-    assert env.next_state(env.initial_state(), Action.right) == env.state_from_grid_position(GridPosition(0, 0))
+    assert env.next_state(env.initial_state(), Action.left) == env.state_from_grid_position(GridPosition(0, 0))
+    assert env.next_state(env.initial_state(), Action.right) == env.state_from_grid_position(GridPosition(1, 0))
 
     # Stochastic tests
     env.failure_rate = 0.1
-    assert ratio_test(lambda state: state == env.state_from_grid_position(GridPosition(0, 0)), partial(env.next_state, env.initial_state(), Action.right), 10000) == 1.0
+    assert ratio_test(lambda state: state == env.state_from_grid_position(GridPosition(0, 0)), partial(env.next_state, env.initial_state(), Action.left), 10000) == 1.0
     ratio = ratio_test(lambda state: state == env.state_from_grid_position(GridPosition(0, 0)), partial(env.next_state, env.initial_state(), Action.up), 10000)
-    assert ratio > 0.09 and ratio < 0.11
+    assert 0.09 < ratio < 0.11
 
 
 def test_termination():
