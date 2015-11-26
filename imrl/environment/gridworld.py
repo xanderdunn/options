@@ -72,8 +72,8 @@ class Gridworld(Environment):
             mapped_action = Action(action)
             tentative_state = (mapped_action == Action.up and GridPosition(position.x, position.y + 1)) or \
                               (mapped_action == Action.down and GridPosition(position.x, position.y - 1)) or \
-                              (mapped_action == Action.left and GridPosition(position.x + 1, position.y)) or \
-                              (mapped_action == Action.right and GridPosition(position.x - 1, position.y))
+                              (mapped_action == Action.left and GridPosition(position.x - 1, position.y)) or \
+                              (mapped_action == Action.right and GridPosition(position.x + 1, position.y))
             if 0 <= tentative_state.x < self.width and 0 <= tentative_state.y < self.height:
                 next_state = tentative_state
         return self.state_from_grid_position(next_state)

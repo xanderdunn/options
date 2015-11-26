@@ -68,7 +68,7 @@ class AgentViz:
 
     def plot_reward(self, id):
         reward = np.amax(np.asarray(self.agent.vi_policy.vi.r), axis=0) if id == 0 \
-            else self.agent.options[id + self.agent.num_actions - 1].policy.vi.r[0]
+            else self.agent.options[id + self.agent.num_actions - 1].policy.vi.r[0]  # self.agent.intrinsic[id + self.agent.num_actions - 1]
         vals = []
         for s in self.state_samples:
             vals.append(np.dot(self.agent.fa.evaluate(s).T, reward))

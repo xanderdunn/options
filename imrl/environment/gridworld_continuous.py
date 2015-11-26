@@ -19,7 +19,7 @@ class GridworldContinuous(Environment):
         self.reward_radius = reward_radius
 
     def create_subgoals(self):
-        return [Subgoal(np.asarray([0.5, 0.5]), 0.05), Subgoal(np.asarray([1, 0]), 0.05), Subgoal(np.asarray([0, 1]), 0.05)]
+        return [Subgoal(np.asarray([0.5, 0.5]), 0.025), Subgoal(np.asarray([1, 0]), 0.05), Subgoal(np.asarray([0, 1]), 0.05)]
 
     def reward_vector(self):
         return self.reward_center
@@ -45,6 +45,6 @@ class GridworldContinuous(Environment):
         move = np.random.normal(self.move_mean, self.move_sd)
         tentative_pos = (mapped_action == Action.up and GridPosition(state[0] + noise, state[1] + move)) or \
                         (mapped_action == Action.down and GridPosition(state[0] + noise, state[1] - move)) or \
-                        (mapped_action == Action.left and GridPosition(state[0] + move, state[1] + noise)) or \
-                        (mapped_action == Action.right and GridPosition(state[0] - move, state[1] + noise))
+                        (mapped_action == Action.left and GridPosition(state[0] - move, state[1] + noise)) or \
+                        (mapped_action == Action.right and GridPosition(state[0] + move, state[1] + noise))
         return np.asarray([min(1, max(tentative_pos.x, 0)), min(1, max(tentative_pos.y, 0))])
