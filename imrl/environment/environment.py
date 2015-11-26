@@ -1,7 +1,7 @@
 """Abstract class for environment."""
 
 
-class Environment:
+class Environment(object):
 
     def __init__(self, num_actions):
         self.num_actions = num_actions
