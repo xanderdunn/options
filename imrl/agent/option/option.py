@@ -7,7 +7,7 @@ import numpy as np
 # First party
 
 
-class Subgoal:
+class Subgoal(object):
 
     def __init__(self, state, radius=0):
         self.state = state
